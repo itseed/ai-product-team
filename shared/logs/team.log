@@ -1,0 +1,83 @@
+=== AI Product Team Log ===
+Started: Thu Mar  5 18:27:32 +07 2026
+==========================
+[2026-03-05 15:55:19] [Dashboard] → ALL: review code in this project
+[2026-03-05 15:56:44] [Dashboard] → PO: Check all feature to ready to release
+[2026-03-05 23:04:40] [Tech Lead] review code in this project
+[2026-03-05 23:04:40] [Product Owner] review code in this project
+[2026-03-05 23:04:40] [QA Tester] review code in this project
+[2026-03-05 23:04:40] [DevOps Engineer] review code in this project
+[2026-03-05 23:05:36] [Product Owner] Check all feature to ready to release
+[2026-03-05 23:27:13] [Developer] review code in this project
+[2026-03-05 16:28:49] [Dashboard] → TECH: review code in this project
+[2026-03-05 23:28:50] [Tech Lead] review code in this project
+[2026-03-05 16:49:08] [Dashboard] → PO: ออกแบบ landing page สำหรับขาย CRM แบบ SaaS
+[2026-03-05 23:49:10] [Product Owner] ออกแบบ landing page สำหรับขาย CRM แบบ SaaS
+[2026-03-05 16:51:03] [Dashboard] → ALL: เริ่มพัฒนางานตามแผน
+[2026-03-05 23:51:03] [Product Owner] เริ่มพัฒนางานตามแผน
+[2026-03-05 23:51:05] [QA Tester] เริ่มพัฒนางานตามแผน
+[2026-03-05 23:51:05] [DevOps Engineer] เริ่มพัฒนางานตามแผน
+[2026-03-05 23:51:05] [Developer] เริ่มพัฒนางานตามแผน
+[2026-03-05 23:51:05] [Tech Lead] เริ่มพัฒนางานตามแผน
+[2026-03-05 18:04:19] [Dashboard] → PO (workflow): ออกแบบหน้า landing page เกี่ยวกับระบบ CRM แบบ SaaS…
+[2026-03-06 01:04:20] [Product Owner] ออกแบบหน้า landing page เกี่ยวกับระบบ CRM แบบ SaaS
+[2026-03-05 18:06:05] [Dashboard] Approved po → tech
+[2026-03-06 01:06:06] [Tech Lead] Based on Product Owner requirements:
+[2026-03-05 18:06:23] [Dashboard] Approved tech → dev
+[2026-03-06 01:06:24] [Developer] Based on Tech Lead architecture:
+[2026-03-05 18:13:58] [Dashboard] → PO (workflow): ออกแบบหน้า landing page เกี่ยวกับระบบ CRM แบบ SaaS…
+[2026-03-06 01:13:58] [Product Owner] ออกแบบหน้า landing page เกี่ยวกับระบบ CRM แบบ SaaS
+[2026-03-05 18:16:56] [Dashboard] Approved po → tech
+[2026-03-06 01:16:58] [Tech Lead] Based on Product Owner requirements:
+[2026-03-05 18:17:20] [Dashboard] Approved tech → dev
+[2026-03-06 01:17:22] [Developer] Based on Tech Lead architecture:
+[2026-03-05 19:46:28] [Dashboard] → PO (workflow): ออกแบบหน้า landing page สำหรับการขายบ้าน มีหลายโครงการให้เลือก…
+[2026-03-06 02:46:29] [Product Owner] ออกแบบหน้า landing page สำหรับการขายบ้าน มีหลายโครงการให้เลือก
+[2026-03-05 19:47:47] [Dashboard] → PO (workflow): ออกแบบหน้า landing page สำหรับการขายบ้าน มีหลายโครงการให้เลือก…
+[2026-03-06 02:47:48] [Product Owner] ออกแบบหน้า landing page สำหรับการขายบ้าน มีหลายโครงการให้เลือก
+[2026-03-05 19:49:00] [Dashboard] → PO (workflow): ออกแบบหน้า landing page สำหรับการขายบ้าน มีหลายโครงการให้เลือก…
+[2026-03-06 02:49:00] [Product Owner] ออกแบบหน้า landing page สำหรับการขายบ้าน มีหลายโครงการให้เลือก
+[2026-03-05 19:52:30] [Dashboard] → PO (workflow): ออกแบบหน้า landing page สำหรับการขายบ้าน มีหลายโครงการให้เลือก…
+[2026-03-06 02:52:33] [Product Owner] ออกแบบหน้า landing page สำหรับการขายบ้าน มีหลายโครงการให้เลือก
+[2026-03-05 19:58:23] [Dashboard] → ALL: ออกแบบหน้า landing page สำหรับการขายบ้าน มีหลายโครงการให้เลือก
+[2026-03-06 02:58:24] [DevOps Engineer] ออกแบบหน้า landing page สำหรับการขายบ้าน มีหลายโครงการให้เลือก
+[2026-03-06 02:58:24] [QA Tester] ออกแบบหน้า landing page สำหรับการขายบ้าน มีหลายโครงการให้เลือก
+[2026-03-06 02:58:24] [Product Owner] ออกแบบหน้า landing page สำหรับการขายบ้าน มีหลายโครงการให้เลือก
+[2026-03-06 02:58:24] [Developer] ออกแบบหน้า landing page สำหรับการขายบ้าน มีหลายโครงการให้เลือก
+[2026-03-06 02:58:24] [Tech Lead] ออกแบบหน้า landing page สำหรับการขายบ้าน มีหลายโครงการให้เลือก
+[2026-03-05 19:58:39] [Dashboard] Approved po → tech
+[2026-03-05 19:58:49] [Dashboard] Approved po → tech
+[2026-03-06 03:00:14] [Tech Lead] Based on Product Owner requirements:
+[2026-03-06 03:00:46] [Tech Lead] Based on Product Owner requirements:
+[2026-03-05 20:01:18] [Dashboard] → PO (workflow): ออกแบบหน้า landing page สำหรับการขายบ้าน มีหลายโครงการให้เลือก…
+[2026-03-06 03:01:19] [Product Owner] ออกแบบหน้า landing page สำหรับการขายบ้าน มีหลายโครงการให้เลือก
+[2026-03-05 20:07:10] [Dashboard] → PO (workflow): ออกแบบหน้า landing page สำหรับการขายบ้าน มีหลายโครงการให้เลือก…
+[2026-03-06 03:07:12] [Product Owner] ออกแบบหน้า landing page สำหรับการขายบ้าน มีหลายโครงการให้เลือก
+[2026-03-05 20:07:32] [Dashboard] Approved po → tech
+[2026-03-06 03:07:33] [Tech Lead] Based on Product Owner requirements:
+[2026-03-05 20:07:46] [Dashboard] Approved po → tech
+[2026-03-05 20:07:50] [Dashboard] Approved tech → dev
+[2026-03-06 03:07:52] [Developer] Based on Tech Lead architecture:
+[2026-03-05 20:11:22] [Dashboard] → DEV: ออกแบบหน้า landing page สำหรับการขายบ้าน มีหลายโครงการให้เลือก
+[2026-03-06 03:11:24] [Developer] ออกแบบหน้า landing page สำหรับการขายบ้าน มีหลายโครงการให้เลือก
+[2026-03-05 20:11:53] [Dashboard] → DEV: ออกแบบหน้า landing page สำหรับการขายบ้าน มีหลายโครงการให้เลือก
+[2026-03-06 03:11:54] [Developer] ออกแบบหน้า landing page สำหรับการขายบ้าน มีหลายโครงการให้เลือก
+[2026-03-05 20:16:47] [Dashboard] → PO (workflow): ออกแบบหน้า landing page สำหรับการขายบ้าน มีหลายโครงการให้เลือกด้วย…
+[2026-03-06 03:16:49] [Product Owner] ออกแบบหน้า landing page สำหรับการขายบ้าน มีหลายโครงการให้เลือกด้วย
+[2026-03-06 03:17:33] [Tech Lead] Based on Product Owner requirements:
+[2026-03-05 20:18:01] [Dashboard] → PO (workflow): ออกแบบหน้า landing page สำหรับการขายบ้าน มีหลายโครงการให้เลือกด้วย…
+[2026-03-06 03:18:04] [Product Owner] ออกแบบหน้า landing page สำหรับการขายบ้าน มีหลายโครงการให้เลือกด้วย
+[2026-03-05 20:18:42] [Dashboard] → PO (workflow): ออกแบบหน้า landing page สำหรับการขายบ้าน มีหลายโครงการให้เลือกด้วย…
+[2026-03-06 03:19:03] [Product Owner] ออกแบบหน้า landing page สำหรับการขายบ้าน มีหลายโครงการให้เลือกด้วย
+[2026-03-05 20:19:09] [Dashboard] Approved po → tech
+[2026-03-05 20:21:33] [Dashboard] Approved po → tech
+[2026-03-05 20:28:18] [Dashboard] → PO (workflow): ออกแบบหน้า landing page สำหรับการขายบ้าน มีหลายโครงการให้เลือกด้วย…
+[2026-03-06 03:28:20] [Product Owner] ออกแบบหน้า landing page สำหรับการขายบ้าน มีหลายโครงการให้เลือกด้วย
+[2026-03-05 20:30:31] [Dashboard] Approved po → tech
+[2026-03-06 03:32:17] [Tech Lead] Based on Product Owner requirements:
+[2026-03-06 03:32:36] [Tech Lead] Based on Product Owner requirements:
+[2026-03-06 03:32:52] [Tech Lead] Based on Product Owner requirements:
+[2026-03-05 20:33:33] [Dashboard] → PO (workflow): ออกแบบหน้า landing page สำหรับการขายบ้าน มีหลายโครงการให้เลือก…
+[2026-03-06 03:33:36] [Product Owner] ออกแบบหน้า landing page สำหรับการขายบ้าน มีหลายโครงการให้เลือก
+[2026-03-05 20:34:36] [Dashboard] Approved tech → dev
+[2026-03-06 03:34:36] [Developer] Based on Tech Lead architecture:

@@ -1,0 +1,106 @@
+FROM: Dashboard
+TIME: 2026-03-05T19:58:49.765Z
+TASK: Based on Product Owner requirements:
+
+I will research the existing landing page structure and components to define the user stories and MVP for the new real estate landing page.
+
+I'll review the existing PO notes to align with previous project requirements and business value.
+
+# Product Brief: Real Estate Landing Page (Multi-Project)
+
+**Product Vision:** *"บ้านในฝันที่ใช่ ในโครงการที่คุณชอบ — ค้นหาง่าย นัดชมได้ทันที"*
+แพลตฟอร์มที่รวบรวมโครงการบ้านและคอนโดหลากหลายทำเล ช่วยให้ผู้ซื้อค้นหาบ้านที่ตรงใจได้รวดเร็วและนัดหมายเข้าชมได้ง่ายที่สุด
+
+---
+
+## Target Users
+- **Home Buyers:** ผู้ที่กำลังมองหาที่อยู่อาศัยใหม่ (บ้านเดี่ยว, ทาวน์โฮม, คอนโด)
+- **Real Estate Investors:** นักลงทุนที่มองหาโครงการในทำเลศักยภาพ
+- **First-time Owners:** กลุ่มคนทำงานที่ต้องการซื้อทรัพย์สินชิ้นแรก
+
+---
+
+## MoSCoW Prioritization
+
+| Priority | Section / Feature |
+|----------|-------------------|
+| **Must** | **Hero & Search Filter** (ค้นหาตามทำเล, ราคา, ประเภท) |
+| **Must** | **Featured Projects** (การ์ดแสดงรูปภาพ, ราคาเริ่มต้น, สถานะโครงการ) |
+| **Must** | **Lead Capture Form** (ลงทะเบียนนัดชมโครงการ / ขอข้อมูลเพิ่ม) |
+| **Must** | **Project Categories** (แยกประเภท บ้านเดี่ยว / ทาวน์โฮม / คอนโด) |
+| **Should** | **Map Integration** (แสดงตำแหน่งโครงการบนแผนที่) |
+| **Should** | **Amenities & Facilities** (ไฮไลท์ส่วนกลาง: สระว่ายน้ำ, ฟิตเนส, สวน) |
+| **Should** | **Loan Calculator** (เครื่องคำนวณเงินกู้เบื้องต้น) |
+| **Could** | **Virtual Tour (360°)** (ชมห้องตัวอย่างออนไลน์) |
+| **Won't** | **Booking Online** (ระบบชำระเงินจองออนไลน์ - v1) |
+
+---
+
+## User Stories (MVP)
+
+### US-01: Hero & Search Filter
+**As a** home buyer,  
+**I want to** search and filter projects by location, type, and price range,  
+**so that** I can find homes that fit my budget and preferred area.
+
+**Acceptance Criteria:**
+- **Given** ผู้ใช้เข้าสู่หน้า Landing Page
+- **When** โหลดหน้าเสร็จ
+- **Then** เห็น Search Bar ที่มีตัวเลือก: "ทำเล (Location)", "ประเภทโครงการ (Type)", และ "ช่วงราคา (Price Range)"
+- **And** มีปุ่ม "ค้นหา" ที่แสดงผลลัพธ์ที่ตรงเงื่อนไขทันที
+
+---
+
+### US-02: Featured Projects Gallery
+**As a** user browsing the site,  
+**I want to** see a list of available projects with key highlights,  
+**so that** I can compare different projects without clicking into every page.
+
+**Acceptance Criteria:**
+- **Given** ผู้ใช้เลื่อนลงมาที่หน้าโครงการแนะนำ
+- **When** เห็นการ์ดโครงการ (Project Cards)
+- **Then** แต่ละการ์ดต้องแสดง: ชื่อโครงการ, รูปภาพหลัก, ราคาเริ่มต้น (e.g. "เริ่ม 3.59 ลบ."), ทำเล และสถานะ (เช่น Pre-sale, Ready to move)
+- **And** สามารถคลิกดูรายละเอียดเพิ่มเติมได้
+
+---
+
+### US-03: Lead Capture (Inquiry & Viewing)
+**As a** prospective buyer,  
+**I want to** leave my contact information for a specific project,  
+**so that** a sales representative can contact me with more details or schedule a visit.
+
+**Acceptance Criteria:**
+- **Given** ผู้ใช้สนใจโครงการใดโครงการหนึ่ง
+- **When** กรอกฟอร์ม (ชื่อ, เบอร์โทร, อีเมล, โครงการที่สนใจ)
+- **Then** ระบบแสดงข้อความยืนยันการส่งข้อมูล (Success Message)
+- **And** ข้อมูลต้องถูกส่งไปที่ระบบหลังบ้านหรืออีเมลฝ่ายขายภายใน 1 นาที
+
+---
+
+### US-04: Project Categories Navigation
+**As a** user with a specific preference,  
+**I want to** browse projects by category,  
+**so that** I don't waste time looking at property types I'm not interested in.
+
+**Acceptance Criteria:**
+- **Given** ผู้ใช้ต้องการดูเฉพาะ "คอนโด" หรือ "บ้านเดี่ยว"
+- **When** คลิกที่เมนูหรือ Icon หมวดหมู่โครงการ
+- **Then** ระบบกรองผลลัพธ์โครงการให้เหลือเฉพาะประเภทที่เลือก
+
+---
+
+## Definition of Done (DoD)
+- [ ] UI เป็น Mobile-first และ Responsive ครบทุก Device
+- [ ] ภาพโครงการต้องเป็น High-quality และรองรับ Lazy Loading
+- [ ] แบบฟอร์ม Lead Capture ต้องมีการทำ Validation (เบอร์โทร/อีเมล)
+- [ ] มีช่องทางติดต่อด่วน (WhatsApp/Line/Call) ที่ลอยอยู่หน้าจอ (Sticky CTA)
+
+---
+
+**ต้องการให้ผมส่งต่อรายละเอียดเหล่านี้ให้ Tech Lead เพื่อออกแบบ Component Structure หรือให้ Dev เริ่มสร้าง Prototype เลยไหมครับ?**
+
+---
+
+Proceed with: technical design.
+WORKFLOW_ID: 1772740350790
+HANDOFF_TO: dev

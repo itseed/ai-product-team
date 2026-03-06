@@ -1,0 +1,64 @@
+FROM: Dashboard
+TIME: 2026-03-05T20:21:33.694Z
+TASK: Based on Product Owner requirements:
+
+I will research the existing project structure and requirements to ensure the new landing page design aligns with the current CRM landing page architecture.
+ในฐานะ Product Owner ผมได้ออกแบบโครงสร้างและรายละเอียดสำหรับ Landing Page ขายบ้านแบบหลายโครงการ (Multi-Project Real Estate) เพื่อให้ตอบโจทย์ทั้งผู้ซื้อที่กำลังมองหาบ้านและธุรกิจที่ต้องการเก็บ Lead คุณภาพครับ
+
+### **Product Vision**
+**"ค้นหาบ้านที่ใช่ ในทำเลที่ชอบ — รวมทุกโครงการคุณภาพไว้ในที่เดียว พร้อมนัดชมได้ทันที"**
+
+---
+
+### **User Stories (MVP)**
+
+**US-01 — Project Discovery (การค้นหาโครงการ)**
+> **As a** ผู้ซื้อบ้าน, **I want to** เห็นรายการโครงการบ้านที่หลากหลายพร้อมข้อมูลเบื้องต้น, **so that** ฉันสามารถเปรียบเทียบและเลือกโครงการที่สนใจได้ง่าย
+
+**Acceptance Criteria:**
+*   **Given** ผู้เยี่ยมชมเข้าสู่หน้า Landing Page
+*   **When** เลื่อนมาที่ส่วน "โครงการทั้งหมด"
+*   **Then** แสดงรายการโครงการในรูปแบบ Card ซึ่งประกอบด้วย: รูปภาพหลัก, ชื่อโครงการ, ทำเล (Location), และราคาเริ่มต้น (Starting Price)
+*   **And** มีป้ายกำกับสถานะโครงการ (เช่น Pre-sale, พร้อมอยู่, หรือ Sold Out)
+
+**US-02 — Search & Filter (การกรองข้อมูล)**
+> **As a** ผู้ซื้อบ้านที่มีงบประมาณและทำเลในใจ, **I want to** กรองโครงการตามทำเล ราคา และประเภทบ้าน, **so that** ฉันพบโครงการที่ตรงความต้องการได้รวดเร็วโดยไม่ต้องไล่ดูทั้งหมด
+
+**Acceptance Criteria:**
+*   **Given** ผู้เยี่ยมชมอยู่ที่หน้าแรก
+*   **When** ใช้งานแถบค้นหา (Search Bar) หรือ Filter
+*   **Then** สามารถเลือกกรองได้ตาม: โซนพื้นที่ (เช่น บางนา, รามอินทรา), ช่วงราคา (เช่น 3-5 ลบ., 5-10 ลบ.), และประเภทบ้าน (บ้านเดี่ยว, ทาวน์โฮม)
+*   **And** ผลลัพธ์ต้องอัปเดตทันทีตามเงื่อนไขที่เลือก
+
+**US-03 — Lead Capture & Registration (การลงทะเบียน)**
+> **As a** ผู้สนใจโครงการ, **I want to** ลงทะเบียนเพื่อรับสิทธิพิเศษหรือนัดชมโครงการ, **so that** เจ้าหน้าที่ฝ่ายขายสามารถติดต่อกลับเพื่อให้ข้อมูลเชิงลึกได้
+
+**Acceptance Criteria:**
+*   **Given** ผู้ใช้คลิกปุ่ม "สนใจโครงการ" หรือ "นัดชมบ้านตัวอย่าง"
+*   **When** กรอกข้อมูลในฟอร์ม (ชื่อ-นามสกุล, เบอร์โทรศัพท์, อีเมล, และโครงการที่สนใจ)
+*   **Then** ระบบต้องแสดงข้อความ "ขอบคุณ/ส่งข้อมูลสำเร็จ" และบันทึกข้อมูลเข้าสู่ระบบ CRM
+*   **And** มีระบบตรวจสอบความถูกต้องของเบอร์โทรศัพท์ (Validation)
+
+---
+
+### **MoSCoW Prioritization**
+
+| Priority | Feature / Section |
+|----------|-------------------|
+| **Must** | Hero Section + Search Bar, Project Cards (Image/Price/Location), Lead Capture Form, Sticky Call/Line CTA |
+| **Should** | Map View (แสดงพิกัดโครงการ), Highlight Facilities (สระว่ายน้ำ, สวน, รปภ.), Testimonials จากลูกบ้าน |
+| **Could** | Mortgage Calculator (เครื่องคำนวณเงินกู้), Virtual Tour 360°, Comparison Tool (เปรียบเทียบ 2 โครงการ) |
+| **Won't** | ระบบจองออนไลน์ (Online Booking), Member Dashboard |
+
+---
+
+### **Sprint Goal (Sprint 1)**
+**"ส่งมอบ Landing Page MVP ที่แสดงรายการโครงการและสามารถรับ Lead จากผู้สนใจได้จริง"**
+
+ต้องการให้ผมจัดทำรายละเอียด Acceptance Criteria สำหรับส่วนใดเพิ่มเติม หรือต้องการให้ส่งต่อให้ Tech Lead เพื่อวางโครงสร้าง Component เลยไหมครับ?
+
+---
+
+Proceed with: technical design.
+WORKFLOW_ID: 1772741922387
+HANDOFF_TO: dev

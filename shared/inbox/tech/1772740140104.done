@@ -1,0 +1,13 @@
+FROM: Dashboard
+TIME: 2026-03-05T19:58:39.109Z
+TASK: Based on Product Owner requirements:
+
+You've hit your limit · resets 4am (Asia/Bangkok)
+You've hit your limit · resets 4am (Asia/Bangkok)
+[Error] Claude CLI unavailable
+
+---
+
+Proceed with: technical design.
+WORKFLOW_ID: 1772740140104
+HANDOFF_TO: dev

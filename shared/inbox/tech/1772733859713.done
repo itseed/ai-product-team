@@ -1,0 +1,93 @@
+FROM: Dashboard
+TIME: 2026-03-05T18:06:05.956Z
+TASK: Based on Product Owner requirements:
+
+## Product Backlog — SaaS CRM Landing Page
+
+### Epic: Landing Page สำหรับระบบ CRM แบบ SaaS
+
+---
+
+### MVP Scope (MoSCoW)
+
+**Must Have**
+- Hero section — Value proposition + CTA หลัก
+- Features section — ฟีเจอร์เด่น 3–6 ข้อ
+- Social Proof — ตัวเลข / testimonials
+- Pricing section — แผนราคา (Free / Pro / Enterprise)
+- CTA section — ลงทะเบียนทดลองใช้ฟรี
+- Navigation + Footer
+
+**Should Have**
+- How it works section (3 steps)
+- FAQ section
+- Demo video embed / screenshot
+
+**Could Have**
+- Live chat widget
+- Blog teaser
+- Integration logos (Slack, Gmail, etc.)
+
+**Won't Have (v1)**
+- Multi-language toggle
+- Animated onboarding tour
+
+---
+
+### User Stories
+
+#### US-01: Hero Section
+> **As a** prospect ที่เพิ่งเข้าเว็บ,
+> **I want** เห็น headline ที่ชัดเจนว่าระบบนี้แก้ปัญหาอะไร,
+> **so that** ฉันตัดสินใจได้ว่าจะอ่านต่อหรือไม่
+
+**Acceptance Criteria:**
+- Given ผู้ใช้เข้าหน้าเว็บ, When โหลดเสร็จ, Then เห็น headline ≤ 10 คำ + sub-headline ≤ 20 คำ
+- มี CTA button "ทดลองใช้ฟรี 14 วัน" ที่ครึ่งบนของหน้า (above the fold)
+- ไม่ต้องกรอก credit card
+
+#### US-02: Features Section
+> **As a** decision maker,
+> **I want** เห็นฟีเจอร์หลักพร้อม icon และคำอธิบาย,
+> **so that** ฉันประเมินได้ว่าระบบตอบโจทย์ธุรกิจหรือไม่
+
+**Acceptance Criteria:**
+- Given เลื่อนลงมาถึง features, Then เห็นการ์ด 6 ฟีเจอร์: Contact Management, Deal Pipeline, Email Automation, Analytics Dashboard, Team Collaboration, Mobile App
+- แต่ละการ์ดมี icon + title + คำอธิบาย 2 บรรทัด
+
+#### US-03: Pricing Section
+> **As a** SMB owner,
+> **I want** เห็นแผนราคาที่เปรียบเทียบกันได้ชัดเจน,
+> **so that** ฉันเลือกแผนที่เหมาะสมกับงบประมาณ
+
+**Acceptance Criteria:**
+- Given ดูหน้า pricing, Then เห็น 3 tier: Free / Pro (฿990/เดือน) / Enterprise (custom)
+- Pro tier มี badge "Popular"
+- แต่ละ tier แสดง feature list + CTA button
+
+#### US-04: Social Proof
+> **As a** prospect ที่ยังลังเล,
+> **I want** เห็นว่ามีบริษัทอื่นใช้แล้วได้ผลจริง,
+> **so that** ฉันมั่นใจพอที่จะลงทะเบียน
+
+**Acceptance Criteria:**
+- แสดง metric: "บริษัท 500+ ไว้วางใจ", "ดีล 1M+ บันทึกแล้ว", "NPS 72"
+- มี testimonial ≥ 3 รายการ พร้อมรูป + ชื่อ + ตำแหน่ง
+
+---
+
+### Definition of Done
+- [ ] Responsive (Mobile / Tablet / Desktop)
+- [ ] Lighthouse Performance ≥ 90
+- [ ] CTA ทุกจุดเชื่อมกับ signup flow
+- [ ] Copy ผ่าน stakeholder review
+
+---
+
+ต้องการให้สร้างโค้ด Landing Page จริงด้วยไหม? สามารถใช้ `/frontend-design` เพื่อ generate UI ได้เลย
+
+---
+
+Proceed with: technical design.
+WORKFLOW_ID: 1772733859713
+HANDOFF_TO: dev

@@ -1,0 +1,78 @@
+FROM: Dashboard
+TIME: 2026-03-05T20:07:32.900Z
+TASK: Based on Product Owner requirements:
+
+I will start by reviewing the current project state and any existing requirements to ensure the new landing page aligns with our established patterns and documentation.
+
+I'll examine the existing PO notes to ensure our new landing page strategy is consistent with previous requirements and the overall product roadmap.
+
+ในฐานะ Product Owner ผมได้ออกแบบโครงสร้าง Landing Page สำหรับโครงการขายบ้านที่มีหลายโครงการให้เลือก (Multi-Project Real Estate) โดยเน้นที่การสร้างความเชื่อมั่นและการนำเสนอข้อมูลที่ช่วยให้ลูกค้าตัดสินใจนัดชมโครงการได้ง่ายที่สุดครับ
+
+---
+
+# Product Brief: Real Estate Multi-Project Landing Page
+
+**Product Vision:** *"รวมโครงการบ้านคุณภาพในทำเลที่ใช่ ให้การหาบ้านในฝันเป็นเรื่องง่ายและจบในที่เดียว"*
+
+---
+
+## 1. User Stories & Acceptance Criteria (MVP)
+
+### US-01: Hero & Search Filter (การค้นหาเบื้องต้น)
+**As a** home buyer, **I want to** filter projects by location, price range, and house type, **so that** I can quickly find projects that match my budget and preferred area.
+
+*   **Acceptance Criteria:**
+    *   **Given** ผู้ใช้เข้าสู่หน้า Landing Page
+    *   **When** โหลดหน้าแรก (Above the fold)
+    *   **Then** เห็นช่องค้นหา (Search Bar) ที่มี Dropdown: ทำเล (e.g. บางนา, พระราม 9), ช่วงราคา (e.g. 3-5 ลบ., 5-10 ลบ.), และประเภท (บ้านเดี่ยว, ทาวน์โฮม)
+    *   **And** มีปุ่ม "ค้นหาโครงการ" ที่ชัดเจน
+
+---
+
+### US-02: Featured Projects Gallery (รายการโครงการแนะนำ)
+**As a** user browsing the site, **I want to** see a list of available projects with key highlights and starting prices, **so that** I can compare multiple options without clicking into every page.
+
+*   **Acceptance Criteria:**
+    *   **Given** ผู้ใช้เลื่อนลงมาที่ส่วนโครงการแนะนำ
+    *   **When** เห็น Project Cards
+    *   **Then** แต่ละ Card ต้องแสดง: รูปภาพหน้าโครงการ (High-res), ชื่อโครงการ, ทำเล, ราคาเริ่มต้น (e.g. "เริ่ม 4.59 ลบ."), และ Badge สถานะ (Pre-sale, พร้อมอยู่)
+
+---
+
+### US-03: Lead Capture Form (การลงทะเบียนนัดชม)
+**As a** prospective buyer, **I want to** submit my contact details for a specific project, **so that** a sales representative can contact me for a private viewing.
+
+*   **Acceptance Criteria:**
+    *   **Given** ผู้ใช้สนใจโครงการใดโครงการหนึ่ง
+    *   **When** คลิกปุ่ม "นัดชมโครงการ" หรือ "รับสิทธิพิเศษ"
+    *   **Then** แสดง Modal หรือ Form ให้กรอก: ชื่อ-นามสกุล, เบอร์โทรศัพท์, อีเมล และโครงการที่สนใจ
+    *   **And** หลังจากส่งข้อมูล ต้องเห็นข้อความ "Success" และได้รับการยืนยันทางอีเมล/SMS ภายใน 5 นาที
+
+---
+
+## 2. MoSCoW Prioritization
+
+| Priority | Feature / Section |
+| :--- | :--- |
+| **Must (MVP)** | Hero Section with Search, Featured Projects Grid, Contact Form, Sticky Call/Line Button |
+| **Should** | Map Integration (Google Maps), Project Facilities (Icons), Virtual Tour 360° |
+| **Could** | Mortgage Calculator (เครื่องคำนวณเงินกู้), Customer Testimonials, Promo Countdown Timer |
+| **Won't (v1)** | Online Booking/Payment System, Member Dashboard |
+
+---
+
+## 3. Definition of Done (DoD)
+*   [ ] รองรับการแสดงผลทุกหน้าจอ (Mobile-First Responsive)
+*   [ ] Page Load Time < 2 วินาที (เพื่อลด Bounce Rate)
+*   [ ] ภาพประกอบทุกภาพต้องเป็นลิขสิทธิ์ของแบรนด์และมีความละเอียดสูง
+*   [ ] แบบฟอร์ม Lead Capture ต้องมีการตรวจสอบความถูกต้องของเบอร์โทรศัพท์ (Validation)
+
+---
+
+**ต้องการให้ผมส่งต่อ User Stories เหล่านี้ให้ Tech Lead เพื่อเริ่มออกแบบ Component ใน React หรือต้องการให้ผมปรับปรุงส่วนไหนเพิ่มเติมไหมครับ?**
+
+---
+
+Proceed with: technical design.
+WORKFLOW_ID: 1772740878208
+HANDOFF_TO: dev

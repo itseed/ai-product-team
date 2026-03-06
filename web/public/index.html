@@ -1,0 +1,485 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AI Product Team :: Mission Control</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Share+Tech+Mono&family=IBM+Plex+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div class="scanlines"></div>
+<div class="noise"></div>
+
+<div id="app">
+
+  <!-- ── HEADER ──────────────────────────────────────────── -->
+  <header id="header">
+    <div class="header-left">
+      <div class="logo">
+        <span class="logo-bracket">[</span>
+        <span class="logo-main">AI PRODUCT TEAM</span>
+        <span class="logo-bracket">]</span>
+      </div>
+      <div class="logo-sub">// MISSION CONTROL v1.0</div>
+    </div>
+    <div class="header-right">
+      <div id="tmux-badge" class="badge badge--off">
+        <span class="badge-dot"></span>
+        tmux: <span id="tmux-status">checking…</span>
+      </div>
+      <div class="badge badge--port">
+        <span class="badge-dot badge-dot--blue"></span>
+        :3030
+      </div>
+      <div id="clock" class="clock">00:00:00</div>
+    </div>
+  </header>
+
+  <!-- ── AGENT STRIP ─────────────────────────────────────── -->
+  <section id="agents-strip">
+    <div class="agent-card" data-role="po" data-color="cyan">
+      <div class="card-accent"></div>
+      <div class="card-top">
+        <span class="agent-emoji">🧑‍💼</span>
+        <span class="status-dot" id="dot-po"></span>
+      </div>
+      <div class="agent-role">PRODUCT OWNER</div>
+      <div class="agent-ai" id="ai-po">claude</div>
+      <div class="agent-inbox">
+        <span class="inbox-count" id="inbox-po">0</span>
+        <span class="inbox-label">pending</span>
+      </div>
+    </div>
+
+    <div class="agent-card" data-role="tech" data-color="blue">
+      <div class="card-accent"></div>
+      <div class="card-top">
+        <span class="agent-emoji">🏗️</span>
+        <span class="status-dot" id="dot-tech"></span>
+      </div>
+      <div class="agent-role">TECH LEAD</div>
+      <div class="agent-ai" id="ai-tech">claude</div>
+      <div class="agent-inbox">
+        <span class="inbox-count" id="inbox-tech">0</span>
+        <span class="inbox-label">pending</span>
+      </div>
+    </div>
+
+    <div class="agent-card" data-role="dev" data-color="green">
+      <div class="card-accent"></div>
+      <div class="card-top">
+        <span class="agent-emoji">💻</span>
+        <span class="status-dot" id="dot-dev"></span>
+      </div>
+      <div class="agent-role">DEVELOPER</div>
+      <div class="agent-ai" id="ai-dev">cursor</div>
+      <div class="agent-inbox">
+        <span class="inbox-count" id="inbox-dev">0</span>
+        <span class="inbox-label">pending</span>
+      </div>
+    </div>
+
+    <div class="agent-card" data-role="qa" data-color="yellow">
+      <div class="card-accent"></div>
+      <div class="card-top">
+        <span class="agent-emoji">🧪</span>
+        <span class="status-dot" id="dot-qa"></span>
+      </div>
+      <div class="agent-role">QA TESTER</div>
+      <div class="agent-ai" id="ai-qa">gemini</div>
+      <div class="agent-inbox">
+        <span class="inbox-count" id="inbox-qa">0</span>
+        <span class="inbox-label">pending</span>
+      </div>
+    </div>
+
+    <div class="agent-card" data-role="devops" data-color="purple">
+      <div class="card-accent"></div>
+      <div class="card-top">
+        <span class="agent-emoji">🚀</span>
+        <span class="status-dot" id="dot-devops"></span>
+      </div>
+      <div class="agent-role">DEVOPS</div>
+      <div class="agent-ai" id="ai-devops">claude</div>
+      <div class="agent-inbox">
+        <span class="inbox-count" id="inbox-devops">0</span>
+        <span class="inbox-label">pending</span>
+      </div>
+    </div>
+
+    <div class="agent-card agent-card--coord" data-role="coord" data-color="white">
+      <div class="card-accent"></div>
+      <div class="card-top">
+        <span class="agent-emoji">📋</span>
+        <span class="status-dot status-dot--on" id="dot-coord"></span>
+      </div>
+      <div class="agent-role">COORDINATOR</div>
+      <div class="agent-ai">claude</div>
+      <div class="agent-inbox">
+        <span class="inbox-count">—</span>
+        <span class="inbox-label">router</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── Main view tabs: Dashboard | Skills ────────────────── -->
+  <nav class="main-nav" id="main-nav">
+    <button type="button" class="main-nav-tab main-nav-tab--active" data-view="dashboard" id="main-tab-dashboard">DASHBOARD</button>
+    <button type="button" class="main-nav-tab" data-view="skills" id="main-tab-skills">SKILLS</button>
+  </nav>
+
+  <!-- ── View: Dashboard (default) ─────────────────────────── -->
+  <div id="view-dashboard" class="main-view main-view--active">
+  <main id="dashboard-grid">
+
+    <!-- LEFT — Task Router + Config ─────────────── -->
+    <div class="col col--left">
+
+      <!-- Task Router (Orchestrator) -->
+      <section class="panel" id="panel-task">
+        <div class="panel-header">
+          <h2>ORCHESTRATOR</h2>
+          <div class="panel-tag">ROUTER</div>
+        </div>
+        <div class="panel-body">
+          <div class="field">
+            <label class="field-label">MODE</label>
+            <select id="task-mode" class="select">
+              <option value="direct">Direct — send to any agent</option>
+              <option value="workflow">Workflow — PO → Tech → Dev → QA (with review)</option>
+            </select>
+          </div>
+          <div class="field" id="field-target-agent">
+            <label class="field-label">TARGET AGENT</label>
+            <select id="task-role" class="select">
+              <option value="all">@ ALL AGENTS</option>
+              <option value="po">🧑‍💼  Product Owner</option>
+              <option value="tech">🏗️   Tech Lead</option>
+              <option value="dev">💻  Developer</option>
+              <option value="qa">🧪  QA Tester</option>
+              <option value="devops">🚀  DevOps</option>
+            </select>
+          </div>
+          <div class="field">
+            <label class="field-label">TASK DESCRIPTION</label>
+            <textarea id="task-input" class="textarea"
+              placeholder="Describe the task…&#10;e.g. Write user stories for login feature"
+              rows="5"></textarea>
+          </div>
+          <button id="btn-dispatch" class="btn btn--primary">
+            <span class="btn-icon">⟶</span> PREPARE & SEND
+          </button>
+          <div id="dispatch-feedback" class="feedback"></div>
+        </div>
+      </section>
+
+      <!-- Confirm Modal -->
+      <div id="confirm-modal" class="confirm-modal hidden">
+        <div class="confirm-modal-backdrop"></div>
+        <div class="confirm-modal-content">
+          <div class="confirm-modal-header">
+            <h3 id="confirm-title">Confirm task</h3>
+            <button type="button" id="btn-confirm-close" class="btn-tiny">✕</button>
+          </div>
+          <div class="confirm-modal-body">
+            <p class="confirm-target" id="confirm-target"></p>
+            <div class="confirm-task-preview" id="confirm-task-preview"></div>
+            <p class="confirm-hint" id="confirm-hint">Agent will process this task. Check Live Feed for progress.</p>
+          </div>
+          <div class="confirm-modal-footer">
+            <button type="button" id="btn-confirm-edit" class="btn btn--secondary">Edit</button>
+            <button type="button" id="btn-confirm-send" class="btn btn--primary">
+              <span class="btn-icon">✓</span> Confirm & Send
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Folder Browse Modal (used by Project Path tab) -->
+      <div id="browse-modal" class="browse-modal hidden">
+        <div class="browse-modal-backdrop"></div>
+        <div class="browse-modal-content">
+          <div class="browse-modal-header">
+            <h3>Select folder</h3>
+            <button type="button" id="btn-browse-close" class="btn-tiny">✕</button>
+          </div>
+          <div class="browse-modal-path">
+            <input type="text" id="browse-path-input" class="input-path" spellcheck="false"
+              placeholder="Path">
+            <button type="button" id="btn-browse-go" class="btn-tiny">Go</button>
+          </div>
+          <div class="browse-modal-list" id="browse-folder-list"></div>
+          <div class="browse-modal-footer">
+            <button type="button" id="btn-browse-select" class="btn btn--primary">Select this folder</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Agent Config -->
+      <section class="panel" id="panel-config">
+        <div class="panel-header">
+          <h2>AGENT CONFIG</h2>
+          <div class="panel-tag">SETTINGS</div>
+        </div>
+        <div class="panel-body">
+          <div class="config-grid">
+            <div class="config-row">
+              <span class="config-label">
+                <span class="config-emoji">🧑‍💼</span> Product Owner
+              </span>
+              <select class="select select--sm" id="cfg-po">
+                <option value="claude">Claude</option>
+                <option value="gemini">Gemini</option>
+                <option value="cursor">Cursor</option>
+              </select>
+            </div>
+            <div class="config-row">
+              <span class="config-label">
+                <span class="config-emoji">🏗️</span> Tech Lead
+              </span>
+              <select class="select select--sm" id="cfg-tech">
+                <option value="claude">Claude</option>
+                <option value="gemini">Gemini</option>
+                <option value="cursor">Cursor</option>
+              </select>
+            </div>
+            <div class="config-row">
+              <span class="config-label">
+                <span class="config-emoji">💻</span> Developer
+              </span>
+              <select class="select select--sm" id="cfg-dev">
+                <option value="cursor">Cursor</option>
+                <option value="claude">Claude</option>
+                <option value="gemini">Gemini</option>
+              </select>
+            </div>
+            <div class="config-row">
+              <span class="config-label">
+                <span class="config-emoji">🧪</span> QA Tester
+              </span>
+              <select class="select select--sm" id="cfg-qa">
+                <option value="gemini">Gemini</option>
+                <option value="claude">Claude</option>
+                <option value="cursor">Cursor</option>
+              </select>
+            </div>
+            <div class="config-row">
+              <span class="config-label">
+                <span class="config-emoji">🚀</span> DevOps
+              </span>
+              <select class="select select--sm" id="cfg-devops">
+                <option value="claude">Claude</option>
+                <option value="gemini">Gemini</option>
+                <option value="cursor">Cursor</option>
+              </select>
+            </div>
+          </div>
+          <button id="btn-save-config" class="btn btn--secondary">
+            <span class="btn-icon">✦</span> SAVE CONFIG
+          </button>
+          <div id="config-feedback" class="feedback"></div>
+        </div>
+      </section>
+
+    </div>
+
+    <!-- CENTER — Live View (tabs: Live Feed | Project Path) ───── -->
+    <div class="col col--center">
+      <section class="panel panel--log" id="panel-log">
+        <div class="panel-header panel-header--tabs">
+          <div class="live-tabs">
+            <button type="button" class="live-tab live-tab--active" data-tab="live" id="tab-btn-live">
+              <span class="live-dot"></span> LIVE FEED
+            </button>
+            <button type="button" class="live-tab" data-tab="workflow" id="tab-btn-workflow">WORKFLOW</button>
+            <button type="button" class="live-tab" data-tab="paths" id="tab-btn-paths">PROJECT PATH</button>
+          </div>
+          <div class="panel-controls live-tab-controls" id="live-tab-controls">
+            <span class="live-indicator">
+              <span class="live-dot"></span> LIVE
+            </span>
+            <button id="btn-clear-log" class="btn-tiny">CLEAR</button>
+            <button id="btn-autoscroll" class="btn-tiny btn-tiny--active">AUTO ↓</button>
+          </div>
+        </div>
+        <div class="live-tab-panels">
+          <div class="live-tab-panel live-tab-panel--active" id="tab-panel-live">
+            <div id="log-filter-bar" class="log-filter-bar">
+              <input type="text" id="log-search" class="log-search" placeholder="Filter log…" spellcheck="false">
+              <div class="log-role-filters">
+                <button class="role-filter-btn role-filter-btn--active" data-filter="all">ALL</button>
+                <button class="role-filter-btn" data-filter="po">PO</button>
+                <button class="role-filter-btn" data-filter="tech">TECH</button>
+                <button class="role-filter-btn" data-filter="dev">DEV</button>
+                <button class="role-filter-btn" data-filter="qa">QA</button>
+                <button class="role-filter-btn" data-filter="devops">OPS</button>
+              </div>
+            </div>
+            <div id="log-output" class="log-output"></div>
+          </div>
+          <div class="live-tab-panel" id="tab-panel-workflow">
+            <div class="workflow-tab-content">
+              <section class="panel panel--compact" id="panel-workflow">
+                <div class="panel-header">
+                  <h2>WORKFLOW PIPELINE</h2>
+                  <div class="panel-tag">PO → Tech → Dev → QA</div>
+                </div>
+                <div class="workflow-pipeline" id="workflow-pipeline">
+                  <div class="workflow-stage" data-stage="po"><span class="stage-icon">🧑‍💼</span><span>PO</span></div>
+                  <div class="workflow-arrow">→</div>
+                  <div class="workflow-stage" data-stage="tech"><span class="stage-icon">🏗️</span><span>Tech</span></div>
+                  <div class="workflow-arrow">→</div>
+                  <div class="workflow-stage" data-stage="dev"><span class="stage-icon">💻</span><span>Dev</span></div>
+                  <div class="workflow-arrow">→</div>
+                  <div class="workflow-stage" data-stage="qa"><span class="stage-icon">🧪</span><span>QA</span></div>
+                </div>
+                <div id="workflow-current" class="workflow-current hidden"></div>
+              </section>
+              <section class="panel panel--compact" id="panel-review">
+                <div class="panel-header">
+                  <h2>PENDING REVIEW</h2>
+                  <div class="panel-tag">Approve & handoff</div>
+                </div>
+                <div id="review-feedback" class="feedback"></div>
+                <div id="review-queue" class="review-queue"></div>
+              </section>
+              <section class="panel panel--compact" id="panel-tasks">
+                <div class="panel-header">
+                  <h2>TASK FLOW</h2>
+                  <button id="btn-refresh-tasks" class="btn-tiny">↺</button>
+                </div>
+                <div id="task-flow-list" class="task-flow-list"></div>
+              </section>
+            </div>
+          </div>
+          <div class="live-tab-panel" id="tab-panel-paths">
+            <div class="panel-body">
+              <div class="path-header-row">
+                <p class="path-intro">Select the folder where Developer AI will write code (usually the same path for both)</p>
+                <span id="ws-loaded-name" class="ws-loaded-badge hidden"></span>
+              </div>
+              <div class="path-fields-primary">
+                <div class="field">
+                  <label class="field-label">📁 Project folder</label>
+                  <div class="path-input-with-browse">
+                    <input type="text" id="path-workspace" class="input-path" spellcheck="false"
+                      placeholder="/Users/you/my-project">
+                    <button type="button" id="btn-browse-folder" class="btn-tiny">Browse…</button>
+                  </div>
+                  <span class="field-desc">AI writes code here · file browser shows files from this folder</span>
+                </div>
+                <div class="field path-project-field">
+                  <label class="field-label">
+                    📂 Project Root
+                    <label class="checkbox-inline">
+                      <input type="checkbox" id="path-same-as-workspace" checked>
+                      <span>Same as above</span>
+                    </label>
+                  </label>
+                  <div class="path-input-with-browse">
+                    <input type="text" id="path-project" class="input-path" spellcheck="false"
+                      placeholder="Leave empty = same path" disabled>
+                    <button type="button" id="btn-browse-project" class="btn-tiny" disabled>Browse…</button>
+                  </div>
+                  <span class="field-desc">Use when project has multiple folders (monorepo) — set as root to browse all files</span>
+                </div>
+              </div>
+              <div class="field-divider">or load from VS Code workspace</div>
+              <div id="ws-dropzone" class="ws-dropzone">
+                <input type="file" id="ws-file-input" accept=".code-workspace" hidden>
+                <div class="ws-drop-content">
+                  <span class="ws-drop-icon">⬡</span>
+                  <span class="ws-drop-label">Drop <code>.code-workspace</code> here</span>
+                  <button class="btn-tiny" id="btn-browse-ws">Browse…</button>
+                </div>
+              </div>
+              <div class="path-input-row">
+                <input type="text" id="ws-server-path" class="input-path"
+                  placeholder="or enter path to .code-workspace file" spellcheck="false">
+                <button class="btn-tiny" id="btn-load-ws-path">Load</button>
+              </div>
+              <div id="ws-folders-wrap" class="ws-folders-wrap hidden">
+                <div class="ws-folders-header">
+                  <span class="ws-folders-title">Folders in workspace</span>
+                  <span class="ws-folders-hint">Select main folder then Apply</span>
+                </div>
+                <div id="ws-folders-list" class="ws-folders-list"></div>
+              </div>
+              <button id="btn-save-paths" class="btn btn--paths">
+                <span class="btn-icon">⌁</span> Apply
+              </button>
+              <div id="paths-feedback" class="feedback"></div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <!-- RIGHT — Project Files ────────────────────── -->
+    <div class="col col--right">
+      <section class="panel panel--files" id="panel-files">
+        <div class="panel-header">
+          <h2>PROJECT FILES</h2>
+          <button id="btn-refresh-files" class="btn-tiny">↺ REFRESH</button>
+        </div>
+        <div id="file-tree" class="file-tree"></div>
+        <div id="file-viewer" class="file-viewer hidden">
+          <div class="file-viewer-header">
+            <span id="file-viewer-path" class="file-viewer-path"></span>
+            <button id="btn-close-viewer" class="btn-tiny">✕</button>
+          </div>
+          <pre id="file-viewer-content" class="file-viewer-content"></pre>
+        </div>
+      </section>
+    </div>
+
+  </main>
+  </div><!-- #view-dashboard -->
+
+  <!-- ── View: Skills (separate tab) ─────────────────────────── -->
+  <div id="view-skills" class="main-view">
+    <div class="skills-view">
+      <div id="skills-api-unavailable" class="skills-api-unavailable hidden">
+        Skills API ไม่พร้อม (404) — กรุณา <strong>restart dashboard server</strong>: <code>cd web && node server.js</code>
+      </div>
+      <div class="skills-sub-tabs" id="skills-sub-tabs">
+        <button type="button" class="skills-sub-tab skills-sub-tab--active" data-skill-panel="map" id="skills-sub-tab-map">Skill Map</button>
+        <button type="button" class="skills-sub-tab" data-skill-panel="list" id="skills-sub-tab-list">Assign Skills</button>
+      </div>
+      <div class="skills-sub-panels">
+        <div class="skills-sub-panel skills-sub-panel--active" id="skills-panel-map">
+          <div id="skills-graph-container" class="skills-graph-container">
+            <div class="graph-placeholder">
+              <span class="graph-placeholder-icon">⬡</span>
+              <span>Click SKILLS tab to load 3D graph</span>
+            </div>
+          </div>
+        </div>
+        <div class="skills-sub-panel" id="skills-panel-list">
+          <div class="skills-assignment">
+            <div class="skills-agent-tabs" id="skills-agent-tabs">
+              <button class="skills-agent-tab skills-agent-tab--active" data-agent="po">🧑‍💼 PO<span class="agent-skill-count hidden" id="count-po">0</span></button>
+              <button class="skills-agent-tab" data-agent="tech">🏗️ Tech<span class="agent-skill-count hidden" id="count-tech">0</span></button>
+              <button class="skills-agent-tab" data-agent="dev">💻 Dev<span class="agent-skill-count hidden" id="count-dev">0</span></button>
+              <button class="skills-agent-tab" data-agent="qa">🧪 QA<span class="agent-skill-count hidden" id="count-qa">0</span></button>
+              <button class="skills-agent-tab" data-agent="devops">🚀 DevOps<span class="agent-skill-count hidden" id="count-devops">0</span></button>
+              <input type="search" id="skills-search" class="skills-search" placeholder="Search skills…" autocomplete="off">
+              <span class="skills-save-hint" id="skills-save-hint"></span>
+            </div>
+            <div id="skills-content" class="skills-content">
+              <div class="skills-loading">Loading skills…</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script src="app.js"></script>
+</body>
+</html>

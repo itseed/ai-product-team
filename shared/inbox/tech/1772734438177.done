@@ -1,0 +1,120 @@
+FROM: Dashboard
+TIME: 2026-03-05T18:16:56.577Z
+TASK: Based on Product Owner requirements:
+
+# Product Brief: SaaS CRM Landing Page
+
+## Product Vision
+แพลตฟอร์ม CRM แบบ SaaS ที่ช่วยให้ทีมขายจัดการลูกค้า ติดตามดีล และเพิ่มรายได้ — ใช้งานได้ทันที ไม่ต้องติดตั้ง
+
+---
+
+## Target Users
+- **Primary:** Sales Manager / ผู้จัดการฝ่ายขาย (ตัดสินใจซื้อ)
+- **Secondary:** Sales Rep / พนักงานขาย (ผู้ใช้งานรายวัน)
+- **Tertiary:** Startup Founder / SME Owner (ซื้อเองใช้เอง)
+
+---
+
+## MoSCoW Prioritization — Landing Page Sections
+
+| Priority | Section |
+|----------|---------|
+| **Must** | Hero + CTA หลัก (Trial Free) |
+| **Must** | Features หลัก (3–5 จุดเด่น) |
+| **Must** | Pricing Plans |
+| **Must** | Social Proof (Testimonials / Logos) |
+| **Should** | Demo Video / Product Screenshot |
+| **Should** | FAQ |
+| **Could** | Comparison Table (vs. Competitors) |
+| **Won't** | Blog / Full Documentation |
+
+---
+
+## User Stories
+
+### 1. Hero Section
+**As a** Sales Manager visiting the site for the first time,  
+**I want to** understand what the product does within 5 seconds,  
+**so that** I can decide whether to explore further.
+
+**Acceptance Criteria:**
+- Given ผู้ใช้เข้าสู่ landing page
+- When โหลดเสร็จ
+- Then เห็น headline ชัดเจน, sub-headline อธิบาย value prop, และปุ่ม "ทดลองใช้ฟรี 14 วัน"
+- And hero image/screenshot แสดง UI ของระบบ
+
+---
+
+### 2. Features Section
+**As a** potential buyer,  
+**I want to** see key features with benefit-focused descriptions,  
+**so that** I understand how it solves my pain points.
+
+**Acceptance Criteria:**
+- Given ผู้ใช้เลื่อนลงมา
+- When ถึง section features
+- Then แสดงอย่างน้อย 5 features: Contact Management, Pipeline Tracking, Email Integration, Analytics Dashboard, Mobile App
+- And แต่ละ feature มี icon + headline + description 1–2 ประโยค
+
+---
+
+### 3. Pricing Section
+**As a** decision maker,  
+**I want to** compare pricing plans ได้ง่าย,  
+**so that** I can choose the right tier for my team.
+
+**Acceptance Criteria:**
+- Given ผู้ใช้ดู pricing
+- When เห็น pricing cards
+- Then มี 3 plans: Starter / Growth / Enterprise
+- And แต่ละ plan มี: ราคา/user/month, feature list, CTA button
+- And มี toggle Monthly/Annual (ส่วนลด 20% เมื่อจ่ายรายปี)
+
+---
+
+### 4. Social Proof
+**As a** skeptical buyer,  
+**I want to** see proof that other companies use this successfully,  
+**so that** I trust the product before signing up.
+
+**Acceptance Criteria:**
+- Given ผู้ใช้เลื่อนดู social proof
+- When ถึง section นี้
+- Then เห็น testimonials อย่างน้อย 3 รายการ พร้อมชื่อ/บริษัท/รูปถ่าย
+- And มี logo bar แสดง company logos ที่ใช้งาน
+- And มี stat highlight เช่น "เพิ่มยอดขาย 35%" / "ลดเวลา follow-up 50%"
+
+---
+
+## MVP Scope (Sprint 1)
+
+```
+✅ Hero Section + CTA
+✅ 5 Key Features
+✅ 3-Tier Pricing
+✅ 3 Testimonials
+✅ Footer (links, contact)
+⬜ Demo Video (Sprint 2)
+⬜ FAQ (Sprint 2)
+⬜ Comparison Table (Sprint 3)
+```
+
+---
+
+## Definition of Done
+- [ ] Responsive (Mobile / Tablet / Desktop)
+- [ ] Page load < 3 วินาที
+- [ ] CTA ทุกจุด track ด้วย Analytics
+- [ ] SEO: meta title, description, OG tags
+- [ ] A/B test CTA copy พร้อมใช้งาน
+
+---
+
+ต้องการให้สร้าง HTML/CSS จริงของ landing page นี้ไหมครับ? หรือต้องการ refine user stories เพิ่มเติม?
+
+---
+
+Proceed with: technical design.
+WORKFLOW_ID: 1772734438177
+HANDOFF_TO: dev

@@ -1,0 +1,100 @@
+FROM: Dashboard
+TIME: 2026-03-05T20:07:50.320Z
+TASK: Based on Tech Lead architecture:
+
+I will read the Product Owner's notes to understand the current requirements and project status.
+I will examine the existing codebase for the CRM landing page to determine the current progress and identify what needs to be implemented.
+I'll review the current task list to understand what's already planned or in progress, ensuring I don't duplicate efforts or miss any critical priorities.
+I'll check the current project's `package.json` to identify the established tech stack, ensuring consistency and adherence to workspace conventions for the new landing page.
+Based on the Product Owner's requirements for the **Real Estate Landing Page (Multi-Project)** and the current state of the project, I have defined the system architecture and technical specifications.
+
+### 🏠 Real Estate Landing Page: Technical Specification
+
+This project will follow the existing workspace conventions: **React 19 + TypeScript + Vite + TailwindCSS 4**.
+
+#### 1. Component Architecture
+The application will be organized into functional, atomic components for reusability and testability.
+
+```text
+/src
+├── /components
+│   ├── /common
+│   │   ├── Button.tsx          (Reusable CTA)
+│   │   ├── Card.tsx            (Base card style)
+│   │   └── Input.tsx           (Styled form inputs)
+│   ├── /Hero
+│   │   ├── Hero.tsx            (Main viewport)
+│   │   └── SearchFilter.tsx    (Location/Type/Price search)
+│   ├── /Projects
+│   │   ├── ProjectGallery.tsx  (Grid container)
+│   │   ├── ProjectCard.tsx     (Image, Price, Status badge)
+│   │   └── CategoryNav.tsx     (Tabs for House/Condo/Townhome)
+│   ├── /LeadCapture
+│   │   └── InquiryForm.tsx     (Validation + Success state)
+│   └── /Layout
+│       ├── Navbar.tsx
+│       └── Footer.tsx
+├── /hooks
+│   └── useProjects.ts          (Data fetching & filtering logic)
+├── /types
+│   └── index.ts                (Project & Category interfaces)
+└── /data
+    └── projects.ts             (Initial mock data for MVP)
+```
+
+#### 2. Technical Decisions & Data Model
+- **Filtering Strategy:** Client-side filtering for the MVP (using `useMemo` for performance). If the project count exceeds 100, we will move to server-side query parameters.
+- **Image Optimization:** Implement `loading="lazy"` and `srcset` for high-quality project images to maintain Lighthouse scores ≥ 90.
+- **Form Handling:** Controlled components with native HTML5 validation + custom regex for phone numbers.
+
+**Data Schema (`Project`):**
+```typescript
+interface Project {
+  id: string;
+  name: string;
+  type: 'House' | 'Condo' | 'Townhome';
+  location: string;
+  priceStart: number;
+  status: 'Pre-sale' | 'Ready to move' | 'Sold out';
+  imageUrl: string;
+  amenities: string[];
+}
+```
+
+---
+
+### 🚨 Critical Risks & Blockers (⚠️)
+
+Before proceeding with the new landing page, we MUST address the following vulnerabilities found in the core system (`server.js`):
+
+1.  **⚠️ Shell Injection (High):** `POST /api/config` writes directly to `config.sh`.
+    *   *Solution:* Implement a strict allowlist regex `^[A-Za-z0-9_/. -]+$` for all config values.
+2.  **⚠️ Arbitrary File Read (Medium):** `POST /api/workspace/parse` accepts any path.
+    *   *Solution:* Resolve the requested path and ensure it starts with the `projectRoot` directory using `path.resolve` and `.startsWith()`.
+3.  **⚠️ Local Network Exposure:** Bind the server to `127.0.0.1` explicitly to prevent accidental external access.
+
+---
+
+### 📋 Task Breakdown (Sprint 1)
+
+**Task 1: Security Hardening (P0)**
+- [ ] Implement input sanitization in `server.js` for config updates.
+- [ ] Add path restriction guards to `workspace/parse` endpoint.
+- [ ] Update `app.listen` to bind only to `localhost`.
+
+**Task 2: Real Estate Project Scaffolding (P1)**
+- [ ] Initialize `real-estate-landing` project structure.
+- [ ] Implement `Hero` and `SearchFilter` components with basic state.
+- [ ] Create `ProjectCard` and `ProjectGallery` to display mock data.
+
+**Task 3: Lead Capture & Conversion (P1)**
+- [ ] Build `InquiryForm` with validation.
+- [ ] Implement `CategoryNav` for filtering by property type.
+
+**Next Action:** I am ready to assign these to the Dev team. Should we fix the security blockers first, or start the UI prototype in parallel?
+
+---
+
+Proceed with: implementation.
+WORKFLOW_ID: 1772740350790
+HANDOFF_TO: qa

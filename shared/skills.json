@@ -1,0 +1,62 @@
+{
+  "po": [
+    "brainstorming",
+    "documentation-templates",
+    "plan-writing",
+    "behavioral-modes",
+    "parallel-agents"
+  ],
+  "tech": [
+    "database-design",
+    "game-development",
+    "geo-fundamentals",
+    "clean-code",
+    "red-team-tactics",
+    "vulnerability-scanner",
+    "parallel-agents",
+    "architecture",
+    "api-patterns",
+    "intelligent-routing",
+    "app-builder",
+    "nextjs-react-expert",
+    "nodejs-best-practices",
+    "mcp-builder",
+    "bash-linux",
+    "powershell-windows",
+    "python-patterns",
+    "rust-pro",
+    "web-design-guidelines"
+  ],
+  "dev": [
+    "nextjs-react-expert",
+    "api-patterns",
+    "frontend-design",
+    "mobile-design",
+    "tailwind-patterns",
+    "web-design-guidelines",
+    "bash-linux",
+    "powershell-windows",
+    "python-patterns",
+    "nodejs-best-practices",
+    "app-builder",
+    "mcp-builder",
+    "game-development",
+    "i18n-localization",
+    "seo-fundamentals"
+  ],
+  "qa": [
+    "testing-patterns",
+    "tdd-workflow",
+    "webapp-testing",
+    "code-review-checklist",
+    "lint-and-validate",
+    "documentation-templates"
+  ],
+  "devops": [
+    "deployment-procedures",
+    "server-management",
+    "performance-profiling",
+    "bash-linux",
+    "powershell-windows"
+  ]
+}

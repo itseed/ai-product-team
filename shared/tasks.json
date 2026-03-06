@@ -1,0 +1,39 @@
+[
+  {
+    "id": 1772741513692,
+    "role": "dev",
+    "task": "ออกแบบหน้า landing page สำหรับการขายบ้าน มีหลายโครงการให้เลือก",
+    "sender": "Dashboard",
+    "targets": [
+      "dev"
+    ],
+    "status": "queued",
+    "createdAt": "2026-03-05T20:11:53.693Z"
+  },
+  {
+    "id": 1772741482278,
+    "role": "dev",
+    "task": "ออกแบบหน้า landing page สำหรับการขายบ้าน มีหลายโครงการให้เลือก",
+    "sender": "Dashboard",
+    "targets": [
+      "dev"
+    ],
+    "status": "queued",
+    "createdAt": "2026-03-05T20:11:22.280Z"
+  },
+  {
+    "id": 1772740703663,
+    "role": "all",
+    "task": "ออกแบบหน้า landing page สำหรับการขายบ้าน มีหลายโครงการให้เลือก",
+    "sender": "Dashboard",
+    "targets": [
+      "po",
+      "tech",
+      "dev",
+      "qa",
+      "devops"
+    ],
+    "status": "queued",
+    "createdAt": "2026-03-05T19:58:23.666Z"
+  }
+]

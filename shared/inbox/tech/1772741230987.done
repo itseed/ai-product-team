@@ -1,0 +1,74 @@
+FROM: Dashboard
+TIME: 2026-03-05T20:07:46.015Z
+TASK: Based on Product Owner requirements:
+
+ยินดีครับ ในฐานะ Product Owner ผมขอเสนอโครงสร้างและ User Story สำหรับ Landing Page ขายโครงการบ้านจัดสรร (Multi-project Real Estate) ดังนี้ครับ
+
+### **Objective**
+สร้าง Landing Page ที่รวบรวมโครงการบ้านต่างๆ เพื่อสร้าง Lead (รายชื่อผู้สนใจ) และส่งต่อให้ทีมขายได้อย่างมีประสิทธิภาพ โดยเน้นความน่าเชื่อถือและการเปรียบเทียบข้อมูลที่ชัดเจน
+
+---
+
+### **User Stories & Acceptance Criteria**
+
+#### **Story 1: Project Discovery & Filtering**
+*As a potential home buyer, I want to browse and filter available housing projects, so that I can find a home that matches my budget and preferred location.*
+
+**Acceptance Criteria:**
+- **Given** ผู้สนใจเข้ามาที่หน้า Landing Page
+- **When** ผู้ใช้ดูส่วน "Our Projects"
+- **Then** ระบบต้องแสดงรายการโครงการทั้งหมดพร้อมรูปภาพปก, ช่วงราคาเริ่มต้น, และทำเลที่ตั้ง
+- **Given** ผู้ใช้ต้องการจำกัดขอบเขตการค้นหา
+- **When** ผู้ใช้เลือก Filter (เช่น โซนพื้นที่, ช่วงราคา, หรือประเภทบ้าน)
+- **Then** ระบบต้องแสดงโครงการที่ตรงตามเงื่อนไขที่เลือกแบบ Real-time หรือกดค้นหาได้
+
+#### **Story 2: Project Highlights**
+*As a potential home buyer, I want to see key highlights and amenities of each project, so that I can decide which project suits my lifestyle.*
+
+**Acceptance Criteria:**
+- **Given** ผู้ใช้เลื่อนดูข้อมูลโครงการรายย่อย
+- **When** ผู้ใช้คลิกดูรายละเอียดเบื้องต้น (Quick View)
+- **Then** ระบบต้องแสดงจุดเด่น 3-5 ข้อ (เช่น ใกล้รถไฟฟ้า, พื้นที่ส่วนกลางขนาดใหญ่, ระบบความปลอดภัย)
+- **Given** โครงการมีหลายแบบบ้าน
+- **When** ผู้ใช้ดูในส่วนรายละเอียด
+- **Then** ระบบต้องแสดงตารางเปรียบเทียบแบบบ้านเบื้องต้น (พื้นที่ใช้สอย, จำนวนห้องนอน/ห้องน้ำ)
+
+#### **Story 3: Lead Capture (The Main Goal)**
+*As a potential home buyer, I want to easily request more information or book a site visit, so that I can move forward with my purchase decision.*
+
+**Acceptance Criteria:**
+- **Given** ผู้ใช้สนใจโครงการใดโครงการหนึ่ง
+- **When** ผู้ใช้กรอกฟอร์ม "ติดต่อเรา" (ชื่อ, เบอร์โทร, โครงการที่สนใจ)
+- **Then** ระบบต้องแสดงข้อความขอบคุณ (Thank you message) และส่งข้อมูลไปยังระบบ CRM หรือ Email ของฝ่ายขายทันที
+- **Given** ผู้ใช้ต้องการความรวดเร็ว
+- **When** ผู้ใช้กดปุ่ม Floating Action (เช่น LINE หรือ Call)
+- **Then** ระบบต้องเปิดแอปพลิเคชันที่เกี่ยวข้องเพื่อเริ่มการสนทนาได้ทันที
+
+---
+
+### **Prioritization (MoSCoW)**
+
+*   **Must Have:**
+    *   รายการโครงการบ้านพร้อมรูปภาพ ราคาเริ่มต้น และที่ตั้ง
+    *   ฟอร์มลงทะเบียนเพื่อรับข้อมูล (Lead Capture Form)
+    *   ข้อมูลติดต่อเบื้องต้น (เบอร์โทร, แผนที่ Google Maps)
+    *   Responsive Design (แสดงผลได้ดีบนมือถือ)
+*   **Should Have:**
+    *   ระบบ Filter แยกตามโซนและราคา
+    *   จุดเด่น/สิ่งอำนวยความสะดวก (Facilities) ของแต่ละโครงการ
+    *   ปุ่มลัดสำหรับ LINE / Facebook Messenger
+*   **Could Have:**
+    *   Virtual Tour 360 องศาสำหรับบ้านตัวอย่าง
+    *   โปรแกรมคำนวณเงินกู้เบื้องต้น (Mortgage Calculator)
+    *   Section รีวิวจากลูกบ้านจริง (Social Proof)
+*   **Won't Have (for MVP):**
+    *   ระบบจองออนไลน์พร้อมชำระเงิน
+    *   ระบบสมาชิกสำหรับติดตามสถานะการกู้
+
+หากคุณเห็นชอบกับโครงสร้างนี้ ผมจะส่งต่อให้ทีม Technical Lead เพื่อออกแบบโครงสร้างไฟล์และเริ่มการพัฒนาใน Sprint ถัดไปครับ
+
+---
+
+Proceed with: technical design.
+WORKFLOW_ID: 1772741230987
+HANDOFF_TO: dev
