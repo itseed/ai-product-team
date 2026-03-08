@@ -1,2 +1,9 @@
 # ignore all files of node_modules
 web/node_modules/
+
+# Runtime / generated files
+.claude/
+shared/logs/
+shared/inbox/
+shared/workflow/
+shared/inbox/**/*.done
