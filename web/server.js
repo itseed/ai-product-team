@@ -129,9 +129,15 @@ function getInboxCounts() {
   }));
 }
 
+let _tmuxCache = { value: false, ts: 0 };
+const TMUX_CACHE_MS = 5000;
+
 function checkTmux() {
-  try { execSync('tmux has-session -t ai_team 2>/dev/null'); return true; }
-  catch { return false; }
+  const now = Date.now();
+  if (now - _tmuxCache.ts < TMUX_CACHE_MS) return _tmuxCache.value;
+  try { execSync('tmux has-session -t ai_team 2>/dev/null'); _tmuxCache = { value: true,  ts: now }; }
+  catch {                                                     _tmuxCache = { value: false, ts: now }; }
+  return _tmuxCache.value;
 }
 
 function sendTask(role, sender, task, opts = {}) {
@@ -166,7 +172,7 @@ function getTaskStatus(role, taskId) {
   const doneFile = path.join(INBOX_DIR, role, `${taskId}.done`);
   if (fs.existsSync(taskFile)) return 'queued';
   if (fs.existsSync(doneFile)) return 'done';
-  return 'done';
+  return 'unknown';
 }
 
 // Detect agents actively working: .done file modified within last 2 min
@@ -185,14 +191,16 @@ function getActiveAgents() {
   }));
 }
 
-function buildFileTree(dir, base = '') {
+function buildFileTree(dir, base = '', depth = 0, maxDepth = 4) {
   const items = [];
   try {
     for (const e of fs.readdirSync(dir, { withFileTypes: true })) {
       const rel = base ? `${base}/${e.name}` : e.name;
       if (e.isDirectory()) {
-        items.push({ name: e.name, path: rel, type: 'dir',
-                     children: buildFileTree(path.join(dir, e.name), rel) });
+        const children = depth < maxDepth
+          ? buildFileTree(path.join(dir, e.name), rel, depth + 1, maxDepth)
+          : [];
+        items.push({ name: e.name, path: rel, type: 'dir', children });
       } else {
         const { size } = fs.statSync(path.join(dir, e.name));
         items.push({ name: e.name, path: rel, type: 'file', size });
@@ -443,7 +451,7 @@ function getReviewQueue() {
       const full = path.join(WORKFLOW_DIR, f);
       const parsed = parseHandoffFile(full);
       if (!parsed) continue;
-      const m = f.match(/^(\d+)_(po|tech)\.handoff$/);
+      const m = f.match(/^(\d+)_(po|tech|dev|qa)\.handoff$/);
       if (!m) continue;
       items.push({
         id: m[1],
@@ -490,7 +498,11 @@ app.post('/api/workflow/approve', (req, res) => {
   if (!reviewId || !fromRole || !handoffTo) return res.status(400).json({ error: 'Missing fields' });
 
   const nextHandoff = HANDOFF_CHAIN[handoffTo] || null;
-  const nextTask = `Based on ${fromRole === 'po' ? 'Product Owner requirements' : 'Tech Lead architecture'}:\n\n${output}\n\n---\n\nProceed with: ${handoffTo === 'tech' ? 'technical design' : handoffTo === 'dev' ? 'implementation' : 'testing'}.`;
+  const fromLabels = { po: 'Product Owner requirements', tech: 'Tech Lead architecture', dev: 'Developer implementation', qa: 'QA test results' };
+  const proceedLabels = { tech: 'technical design', dev: 'implementation', qa: 'quality assurance testing' };
+  const fromLabel   = fromLabels[fromRole]   || `${fromRole} output`;
+  const proceedLabel = proceedLabels[handoffTo] || 'next phase';
+  const nextTask = `Based on ${fromLabel}:\n\n${output}\n\n---\n\nProceed with: ${proceedLabel}.`;
 
   sendTask(handoffTo, 'Dashboard', nextTask, {
     workflowId: reviewId,
@@ -709,6 +721,15 @@ app.get('/api/files', (_req, res) => {
   res.json({ path: projectRoot, items: buildFileTree(projectRoot) });
 });
 
+const BINARY_EXTS = new Set([
+  'png','jpg','jpeg','gif','webp','ico','svg','bmp',
+  'pdf','zip','tar','gz','bz2','7z','rar',
+  'exe','dll','so','dylib','bin','wasm',
+  'mp3','mp4','wav','ogg','webm','mov','avi',
+  'ttf','otf','woff','woff2','eot',
+  'db','sqlite','sqlite3',
+]);
+
 app.get('/api/files/*', (req, res) => {
   const { projectRoot } = loadPaths();
   const rel  = req.params[0];
@@ -716,6 +737,9 @@ app.get('/api/files/*', (req, res) => {
   if (!full.startsWith(path.resolve(projectRoot)))
     return res.status(403).json({ error: 'Forbidden' });
   try {
+    const ext = path.extname(full).slice(1).toLowerCase();
+    if (BINARY_EXTS.has(ext))
+      return res.json({ content: null, binary: true, path: rel });
     res.json({ content: fs.readFileSync(full, 'utf8'), path: rel });
   } catch { res.status(404).json({ error: 'Not found' }); }
 });

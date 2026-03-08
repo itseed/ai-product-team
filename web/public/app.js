@@ -15,6 +15,7 @@ const   state = {
   workflow: null,
   pendingDispatch: null,
   logFilter: { role: 'all', text: '' },
+  logRoleCounts: {},
   skillsCatalog: [],
   agentSkills: {},
   skillsApiUnavailable: false,
@@ -98,6 +99,7 @@ function applyInbox(inbox) {
   for (const [role, count] of Object.entries(inbox)) {
     const countEl = document.getElementById(`inbox-${role}`);
     const dotEl   = document.getElementById(`dot-${role}`);
+    const barEl   = document.getElementById(`bar-${role}`);
     if (!countEl) continue;
 
     countEl.textContent = count;
@@ -110,6 +112,11 @@ function applyInbox(inbox) {
       } else {
         dotEl.classList.add('status-dot--on');
       }
+    }
+
+    // Workload bar: fills up proportionally (max at 5 tasks = 100%)
+    if (barEl) {
+      barEl.style.width = count > 0 ? `${Math.min(count / 5 * 100, 100)}%` : '0';
     }
   }
 }
@@ -138,8 +145,11 @@ function applyTmux(running) {
 }
 
 // ── SSE Log Stream ────────────────────────────────────────────
+let _sseReconnecting = false;
+
 function initSSE() {
   if (state.sse) state.sse.close();
+  _sseReconnecting = false;
 
   const es = new EventSource('/api/logs/stream');
   state.sse = es;
@@ -160,6 +170,8 @@ function initSSE() {
   };
 
   es.onerror = () => {
+    if (_sseReconnecting) return;
+    _sseReconnecting = true;
     appendLogLine('[Dashboard] ⚠ Log stream disconnected — reconnecting…', false, 'system');
     state.sse = null;
     setTimeout(initSSE, 4000);
@@ -187,6 +199,16 @@ function appendLogLine(raw, seed = false, forceClass = null) {
   el.textContent = raw;
   if (seed) el.style.opacity = '0.6';
 
+  // Track per-role count and flash new (non-seed) lines
+  if (!seed && roleClass && roleClass !== 'dash') {
+    state.logRoleCounts[roleClass] = (state.logRoleCounts[roleClass] || 0) + 1;
+    updateLogFilterCounts();
+  }
+  if (!seed) {
+    el.classList.add('log-line--flash');
+    el.addEventListener('animationend', () => el.classList.remove('log-line--flash'), { once: true });
+  }
+
   // Apply current filter to new line
   const { role: fr, text: ft } = state.logFilter;
   if ((fr !== 'all' && !el.classList.contains(`log-line--${fr}`)) ||
@@ -204,6 +226,16 @@ function appendLogLine(raw, seed = false, forceClass = null) {
   while (out.children.length > 300) {
     out.removeChild(out.firstChild);
   }
+}
+
+function updateLogFilterCounts() {
+  const map = { po: 'PO', tech: 'TECH', dev: 'DEV', qa: 'QA', devops: 'OPS' };
+  document.querySelectorAll('.role-filter-btn[data-filter]').forEach(btn => {
+    const f = btn.dataset.filter;
+    if (f === 'all') return;
+    const count = state.logRoleCounts[f] || 0;
+    btn.textContent = count > 0 ? `${map[f] || f.toUpperCase()} (${count})` : (map[f] || f.toUpperCase());
+  });
 }
 
 // ── Workflow ──────────────────────────────────────────────────
@@ -269,9 +301,15 @@ function renderReviewQueue() {
   }
 
   container.innerHTML = queue.map(item => {
-    const fromLabel  = item.fromRole === 'po' ? 'Product Owner' : 'Tech Lead';
-    const toLabel    = ROLE_LABELS[item.handoffTo] || item.handoffTo;
+    const roleLabels = { po: 'Product Owner', tech: 'Tech Lead', dev: 'Developer', qa: 'QA Tester' };
+    const fromLabel  = roleLabels[item.fromRole] || item.fromRole;
+    const isComplete = item.fromRole === 'qa' || !item.handoffTo;
+    const toLabel    = isComplete ? '✅ Pipeline Complete' : (ROLE_LABELS[item.handoffTo] || item.handoffTo);
     const taskShort  = (item.task || '').slice(0, 80) + ((item.task || '').length > 80 ? '…' : '');
+    const actions = isComplete
+      ? `<button class="btn btn--secondary btn-reject" data-action="reject">Dismiss</button>`
+      : `<button class="btn-tiny btn-reject" data-action="reject">Reject</button>
+         <button class="btn btn--primary btn-approve" data-action="approve">Approve & Send</button>`;
     return `
       <div class="review-item" data-id="${item.id}" data-from="${item.fromRole}">
         <div class="review-item-header">
@@ -282,10 +320,7 @@ function renderReviewQueue() {
           <summary>View output</summary>
           <pre>${esc(item.output || '')}</pre>
         </details>
-        <div class="review-item-actions">
-          <button class="btn-tiny btn-reject" data-action="reject">Reject</button>
-          <button class="btn btn--primary btn-approve" data-action="approve">Approve & Send</button>
-        </div>
+        <div class="review-item-actions">${actions}</div>
       </div>`;
   }).join('');
 
@@ -375,8 +410,8 @@ function renderTaskFlow() {
 
   list.innerHTML = tasks.map(t => {
     const role = (t.targets || [t.role])[0];
-    const statusClass = t.status === 'queued' ? 'queued' : 'done';
-    const statusLabel = t.status === 'queued' ? 'Queued' : 'Done';
+    const statusClass = t.status === 'queued' ? 'queued' : t.status === 'done' ? 'done' : 'unknown';
+    const statusLabel = t.status === 'queued' ? 'Queued' : t.status === 'done' ? 'Done' : '—';
     const time = t.createdAt ? new Date(t.createdAt).toLocaleTimeString() : '';
     const taskShort = (t.task || '').slice(0, 60) + ((t.task || '').length > 60 ? '…' : '');
     return `
@@ -812,7 +847,8 @@ async function openFile(filePath) {
     const data = await r.json();
 
     document.getElementById('file-viewer-path').textContent = data.path;
-    document.getElementById('file-viewer-content').textContent = data.content;
+    document.getElementById('file-viewer-content').textContent =
+      data.binary ? '⬡  Binary file — cannot display' : (data.content || '');
     document.getElementById('file-viewer').classList.remove('hidden');
   } catch (e) {
     console.warn('File open failed', e);
@@ -834,17 +870,49 @@ function showFeedback(el, msg, type) {
 }
 
 // ── Agent card → prefill task router ─────────────────────────
+function selectAgentTarget(role) {
+  // Update hidden select
+  const sel = document.getElementById('task-role');
+  if (sel) sel.value = role;
+
+  // Update chip active state
+  document.querySelectorAll('.agent-chip').forEach(c => c.classList.remove('agent-chip--active'));
+  const chip = document.querySelector(`.agent-chip[data-role="${role}"]`);
+  if (chip) chip.classList.add('agent-chip--active');
+
+  // Update card selected state
+  document.querySelectorAll('.agent-card').forEach(c => c.classList.remove('agent-card--selected'));
+  const card = document.querySelector(`.agent-card[data-role="${role}"]`);
+  if (card) card.classList.add('agent-card--selected');
+}
+
 function bindAgentCards() {
+  // Agent card click → select target
   document.querySelectorAll('.agent-card').forEach(card => {
     card.addEventListener('click', () => {
       const role = card.dataset.role;
       if (role === 'coord') return;
-      const sel = document.getElementById('task-role');
-      if (sel && role) {
-        sel.value = role;
-        document.getElementById('task-input').focus();
-      }
+      selectAgentTarget(role);
+      document.getElementById('task-input')?.focus();
     });
+  });
+
+  // Chip click → select target
+  document.querySelectorAll('.agent-chip').forEach(chip => {
+    chip.addEventListener('click', () => {
+      selectAgentTarget(chip.dataset.role);
+    });
+  });
+
+  // Char counter for textarea
+  const taskInput = document.getElementById('task-input');
+  const charCount = document.getElementById('task-char-count');
+  taskInput?.addEventListener('input', () => {
+    const len = taskInput.value.length;
+    if (charCount) {
+      charCount.textContent = `${len} char${len !== 1 ? 's' : ''}`;
+      charCount.classList.toggle('char-count--warn', len > 500);
+    }
   });
 }
 
@@ -1107,6 +1175,8 @@ async function toggleSkill(agentId, skillId) {
   if (!state.agentSkills[agentId]) state.agentSkills[agentId] = [];
   const arr = state.agentSkills[agentId];
   const action = arr.includes(skillId) ? 'remove' : 'add';
+  // Snapshot for rollback
+  const prev = [...arr];
   if (action === 'add') arr.push(skillId);
   else state.agentSkills[agentId] = arr.filter(s => s !== skillId);
 
@@ -1122,13 +1192,35 @@ async function toggleSkill(agentId, skillId) {
       body: JSON.stringify({ agent: agentId, skillId, action }),
     });
     const data = await r.json();
-    if (hint) {
-      hint.textContent = data.success ? '✓ Saved' : `Error: ${data.error}`;
-      hint.className = `skills-save-hint skills-save-hint--${data.success ? 'ok' : 'err'}`;
-      setTimeout(() => { hint.textContent = ''; hint.className = 'skills-save-hint'; }, 2000);
+    if (data.success) {
+      if (hint) {
+        hint.textContent = '✓ Saved';
+        hint.className = 'skills-save-hint skills-save-hint--ok';
+        setTimeout(() => { hint.textContent = ''; hint.className = 'skills-save-hint'; }, 2000);
+      }
+    } else {
+      // Rollback optimistic update
+      state.agentSkills[agentId] = prev;
+      renderSkillsContent();
+      updateAgentTabCounts();
+      if (state.graph3d) state.graph3d.graphData(buildGraphData());
+      if (hint) {
+        hint.textContent = `Error: ${data.error}`;
+        hint.className = 'skills-save-hint skills-save-hint--err';
+        setTimeout(() => { hint.textContent = ''; hint.className = 'skills-save-hint'; }, 3000);
+      }
     }
   } catch (e) {
-    if (hint) { hint.textContent = 'Network error'; hint.className = 'skills-save-hint skills-save-hint--err'; }
+    // Rollback on network error
+    state.agentSkills[agentId] = prev;
+    renderSkillsContent();
+    updateAgentTabCounts();
+    if (state.graph3d) state.graph3d.graphData(buildGraphData());
+    if (hint) {
+      hint.textContent = 'Network error — change not saved';
+      hint.className = 'skills-save-hint skills-save-hint--err';
+      setTimeout(() => { hint.textContent = ''; hint.className = 'skills-save-hint'; }, 3000);
+    }
   }
 }
 

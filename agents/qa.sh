@@ -79,7 +79,7 @@ while true; do
   echo -e "${COLOR}│${NC}  ${GRAY}AI: $AI  ·  Project: $WORKSPACE_DIR${NC}"
   log_event "$ROLE" "$task"
 
-  response=$(call_ai "$AI" "$(get_system_prompt)" "$task")
+  response=$(call_ai "$AI" "$(append_skills "$(get_system_prompt)" "$INBOX_ROLE")" "$task")
 
   echo -e "${COLOR}│${NC}"
   echo "$response" | while IFS= read -r line; do
@@ -87,6 +87,20 @@ while true; do
   done
   echo -e "${COLOR}│${NC}"
   echo -e "${COLOR}└───────────────────────────────────────────────────┘${NC}"
+
+  # Workflow handoff: qa is the last step — write handoff for dashboard review
+  if [[ -n "$WORKFLOW_ID" ]]; then
+    mkdir -p "$SHARED_DIR/workflow"
+    handoff_file="$SHARED_DIR/workflow/${WORKFLOW_ID}_qa.handoff"
+    {
+      echo "HANDOFF_TO="
+      echo "---TASK---"
+      echo "$task"
+      echo "---OUTPUT---"
+      echo "$response"
+    } > "$handoff_file"
+    log_event "$ROLE" "Workflow $WORKFLOW_ID complete (QA done)"
+  fi
 
   mkdir -p "$WORKSPACE_DIR/tests" 2>/dev/null
   {

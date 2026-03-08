@@ -40,7 +40,7 @@
 
   <!-- ── AGENT STRIP ─────────────────────────────────────── -->
   <section id="agents-strip">
-    <div class="agent-card" data-role="po" data-color="cyan">
+    <div class="agent-card" data-role="po" data-color="cyan" title="Click to target this agent">
       <div class="card-accent"></div>
       <div class="card-top">
         <span class="agent-emoji">🧑‍💼</span>
@@ -52,9 +52,10 @@
         <span class="inbox-count" id="inbox-po">0</span>
         <span class="inbox-label">pending</span>
       </div>
+      <div class="inbox-bar" id="bar-po"></div>
     </div>
 
-    <div class="agent-card" data-role="tech" data-color="blue">
+    <div class="agent-card" data-role="tech" data-color="blue" title="Click to target this agent">
       <div class="card-accent"></div>
       <div class="card-top">
         <span class="agent-emoji">🏗️</span>
@@ -66,9 +67,10 @@
         <span class="inbox-count" id="inbox-tech">0</span>
         <span class="inbox-label">pending</span>
       </div>
+      <div class="inbox-bar" id="bar-tech"></div>
     </div>
 
-    <div class="agent-card" data-role="dev" data-color="green">
+    <div class="agent-card" data-role="dev" data-color="green" title="Click to target this agent">
       <div class="card-accent"></div>
       <div class="card-top">
         <span class="agent-emoji">💻</span>
@@ -80,9 +82,10 @@
         <span class="inbox-count" id="inbox-dev">0</span>
         <span class="inbox-label">pending</span>
       </div>
+      <div class="inbox-bar" id="bar-dev"></div>
     </div>
 
-    <div class="agent-card" data-role="qa" data-color="yellow">
+    <div class="agent-card" data-role="qa" data-color="yellow" title="Click to target this agent">
       <div class="card-accent"></div>
       <div class="card-top">
         <span class="agent-emoji">🧪</span>
@@ -94,9 +97,10 @@
         <span class="inbox-count" id="inbox-qa">0</span>
         <span class="inbox-label">pending</span>
       </div>
+      <div class="inbox-bar" id="bar-qa"></div>
     </div>
 
-    <div class="agent-card" data-role="devops" data-color="purple">
+    <div class="agent-card" data-role="devops" data-color="purple" title="Click to target this agent">
       <div class="card-accent"></div>
       <div class="card-top">
         <span class="agent-emoji">🚀</span>
@@ -108,6 +112,7 @@
         <span class="inbox-count" id="inbox-devops">0</span>
         <span class="inbox-label">pending</span>
       </div>
+      <div class="inbox-bar" id="bar-devops"></div>
     </div>
 
     <div class="agent-card agent-card--coord" data-role="coord" data-color="white">
@@ -154,13 +159,21 @@
           </div>
           <div class="field" id="field-target-agent">
             <label class="field-label">TARGET AGENT</label>
-            <select id="task-role" class="select">
-              <option value="all">@ ALL AGENTS</option>
-              <option value="po">🧑‍💼  Product Owner</option>
-              <option value="tech">🏗️   Tech Lead</option>
-              <option value="dev">💻  Developer</option>
-              <option value="qa">🧪  QA Tester</option>
-              <option value="devops">🚀  DevOps</option>
+            <div class="agent-chips" id="agent-chips">
+              <button type="button" class="agent-chip agent-chip--all agent-chip--active" data-role="all">@ ALL</button>
+              <button type="button" class="agent-chip agent-chip--po" data-role="po">🧑‍💼 PO</button>
+              <button type="button" class="agent-chip agent-chip--tech" data-role="tech">🏗️ TECH</button>
+              <button type="button" class="agent-chip agent-chip--dev" data-role="dev">💻 DEV</button>
+              <button type="button" class="agent-chip agent-chip--qa" data-role="qa">🧪 QA</button>
+              <button type="button" class="agent-chip agent-chip--devops" data-role="devops">🚀 OPS</button>
+            </div>
+            <select id="task-role" class="select" style="display:none">
+              <option value="all">All Agents</option>
+              <option value="po">Product Owner</option>
+              <option value="tech">Tech Lead</option>
+              <option value="dev">Developer</option>
+              <option value="qa">QA Tester</option>
+              <option value="devops">DevOps</option>
             </select>
           </div>
           <div class="field">
@@ -168,6 +181,10 @@
             <textarea id="task-input" class="textarea"
               placeholder="Describe the task…&#10;e.g. Write user stories for login feature"
               rows="5"></textarea>
+            <div class="textarea-meta">
+              <span id="task-char-count" class="char-count">0 chars</span>
+              <span class="shortcut-hint">⌘↵ to send</span>
+            </div>
           </div>
           <button id="btn-dispatch" class="btn btn--primary">
             <span class="btn-icon">⟶</span> PREPARE & SEND

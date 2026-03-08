@@ -643,6 +643,105 @@ body::before {
 .btn-tiny:hover { color: var(--text); border-color: var(--text-dim); }
 .btn-tiny--active { color: var(--cyan); border-color: var(--cyan); }
 
+/* ── Agent Chips (Task Router target selector) ───────────────── */
+
+.agent-chips {
+  display: flex;
+  gap: 5px;
+  flex-wrap: wrap;
+}
+
+.agent-chip {
+  padding: 5px 11px;
+  border: 1px solid var(--border-hi);
+  border-radius: var(--radius);
+  background: var(--bg-input);
+  color: var(--text-dim);
+  font-family: var(--font-display);
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  cursor: pointer;
+  transition: all var(--transition);
+}
+
+.agent-chip:hover {
+  color: var(--text);
+  border-color: var(--border-hi);
+  background: var(--bg-card);
+}
+
+.agent-chip--all.agent-chip--active   { color: var(--white);  border-color: var(--white);  background: rgba(224,234,255,0.07); }
+.agent-chip--po.agent-chip--active    { color: var(--cyan);   border-color: var(--cyan);   background: var(--glow-cyan); }
+.agent-chip--tech.agent-chip--active  { color: var(--blue);   border-color: var(--blue);   background: var(--glow-blue); }
+.agent-chip--dev.agent-chip--active   { color: var(--green);  border-color: var(--green);  background: var(--glow-green); }
+.agent-chip--qa.agent-chip--active    { color: var(--yellow); border-color: var(--yellow); background: var(--glow-yellow); }
+.agent-chip--devops.agent-chip--active { color: var(--purple); border-color: var(--purple); background: var(--glow-purple); }
+
+/* ── Textarea meta row (char count + shortcut hint) ──────────── */
+
+.textarea-meta {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 3px;
+}
+
+.char-count {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: var(--text-muted);
+  transition: color var(--transition);
+}
+
+.char-count--warn { color: var(--yellow); }
+
+.shortcut-hint {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: var(--text-muted);
+  letter-spacing: 0.04em;
+  opacity: 0.7;
+}
+
+/* ── Agent Card: selected state + workload bar ───────────────── */
+
+.agent-card--selected {
+  background: var(--bg-panel);
+}
+
+.agent-card--selected .card-accent {
+  opacity: 1 !important;
+  box-shadow: 0 2px 12px currentColor;
+}
+
+.inbox-bar {
+  position: absolute;
+  bottom: 0; left: 0;
+  height: 2px;
+  width: 0;
+  transition: width 0.5s ease;
+  opacity: 0.6;
+}
+
+.agent-card[data-color="cyan"]   .inbox-bar { background: var(--cyan); }
+.agent-card[data-color="blue"]   .inbox-bar { background: var(--blue); }
+.agent-card[data-color="green"]  .inbox-bar { background: var(--green); }
+.agent-card[data-color="yellow"] .inbox-bar { background: var(--yellow); }
+.agent-card[data-color="purple"] .inbox-bar { background: var(--purple); }
+.agent-card[data-color="white"]  .inbox-bar { background: var(--white); }
+
+/* ── Log line flash animation ────────────────────────────────── */
+
+@keyframes log-flash {
+  0%   { background: rgba(0, 229, 255, 0.1); }
+  100% { background: transparent; }
+}
+
+.log-line--flash {
+  animation: log-flash 0.7s ease-out forwards;
+}
+
 /* ── Feedback ────────────────────────────────────────────────── */
 
 .feedback {

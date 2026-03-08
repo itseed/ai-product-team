@@ -57,7 +57,7 @@ while true; do
   echo -e "${COLOR}│${NC}  ${GRAY}AI: $AI${NC}"
   log_event "$ROLE" "$task"
 
-  response=$(call_ai "$AI" "$SYSTEM_PROMPT" "$task")
+  response=$(call_ai "$AI" "$(append_skills "$SYSTEM_PROMPT" "$INBOX_ROLE")" "$task")
 
   echo -e "${COLOR}│${NC}"
   echo "$response" | while IFS= read -r line; do

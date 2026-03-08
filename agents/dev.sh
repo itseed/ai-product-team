@@ -92,7 +92,7 @@ while true; do
   # Run cursor agent in the code workspace
   # It will write files directly there
   cd "$WORKSPACE_DIR" 2>/dev/null
-  response=$(call_ai "$AI" "$(get_system_prompt)" "$task")
+  response=$(call_ai "$AI" "$(append_skills "$(get_system_prompt)" "$INBOX_ROLE")" "$task")
   cd "$SCRIPT_DIR" 2>/dev/null
 
   echo "$response" | while IFS= read -r line; do
@@ -100,6 +100,20 @@ while true; do
   done
   echo -e "${COLOR}│${NC}"
   echo -e "${COLOR}└───────────────────────────────────────────────────┘${NC}"
+
+  # Workflow handoff: write for review if this was a workflow task
+  if [[ -n "$WORKFLOW_ID" && -n "$HANDOFF_TO" ]]; then
+    mkdir -p "$SHARED_DIR/workflow"
+    handoff_file="$SHARED_DIR/workflow/${WORKFLOW_ID}_dev.handoff"
+    {
+      echo "HANDOFF_TO=$HANDOFF_TO"
+      echo "---TASK---"
+      echo "$task"
+      echo "---OUTPUT---"
+      echo "$response"
+    } > "$handoff_file"
+    log_event "$ROLE" "Workflow $WORKFLOW_ID → handoff to $HANDOFF_TO"
+  fi
 
   # Show what files were created/modified
   echo -e "${COLOR}📁 Files in workspace:${NC}"
