@@ -70,8 +70,8 @@ show_status() {
 # ── Main loop ────────────────────────────────────────────────
 while true; do
   echo -ne "${WHITE}[COORD]${NC} ❯ "
-  if ! IFS= read -r -t 3 input 2>/dev/null; then
-    echo -ne "\r\033[2K"; continue
+  if ! IFS= read -r input 2>/dev/null; then
+    break  # EOF / Ctrl+D
   fi
   [[ -z "$input" ]] && continue
 

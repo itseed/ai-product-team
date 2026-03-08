@@ -146,24 +146,25 @@ mark_done() {
 }
 
 # ── Helper: read with inbox polling ──────────────────────────
-# Polls inbox every 3 s so web-dispatched tasks are received
-# without the user pressing Enter.
+# Waits for user input while a background watcher polls the inbox
+# every 2 s. When a task arrives, SIGUSR1 interrupts blocking read
+# so the user's prompt is never cleared on a timer.
 #
 # Usage:  read_input ROLE COLOR SHORT_NAME
 # Output: sets AGENT_TASK and AGENT_TASK_SOURCE ("inbox"|"user")
-# Returns: 0 = task ready, 1 = user typed exit/quit
+# Returns: 0 = task ready, 1 = user typed exit/quit or EOF
 read_input() {
   local role="$1" color="$2" short="$3"
   AGENT_TASK="" AGENT_TASK_SOURCE=""
+  WORKFLOW_ID="" HANDOFF_TO=""
 
   while true; do
-    # ── Check inbox (web / coordinator tasks) ────────────
+    # ── Check inbox immediately before prompting ─────────
     local inbox_file
     inbox_file=$(check_inbox "$role")
     if [[ -n "$inbox_file" ]]; then
       local sender task
       sender=$(grep "^FROM:" "$inbox_file" 2>/dev/null | sed 's/^FROM: //')
-      # Full multiline task (from TASK: until WORKFLOW_ID:/HANDOFF_TO: or end)
       task=$(awk '/^TASK: /{p=1; sub(/^TASK: /,""); if(length) print; next} p{if(/^WORKFLOW_ID:|^HANDOFF_TO:/) exit; print}' "$inbox_file" 2>/dev/null)
       WORKFLOW_ID=$(grep "^WORKFLOW_ID:" "$inbox_file" 2>/dev/null | sed 's/^WORKFLOW_ID: //')
       HANDOFF_TO=$(grep "^HANDOFF_TO:" "$inbox_file" 2>/dev/null | sed 's/^HANDOFF_TO: //')
@@ -177,16 +178,39 @@ read_input() {
       return 0
     fi
 
-    # ── Wait for keyboard input (3 s timeout) ───────────
+    # ── Start background inbox watcher ───────────────────
+    local _inbox_arrived=0 _watcher_pid
+    ( while true; do
+        sleep 2
+        [[ -n "$(check_inbox "$role")" ]] && { kill -USR1 $$ 2>/dev/null; exit; }
+      done
+    ) &
+    _watcher_pid=$!
+    trap '_inbox_arrived=1' USR1
+
+    # ── Blocking read — no timeout, no flicker ───────────
     echo -ne "${color}[${short}]${NC} ❯ "
-    if IFS= read -r -t 3 AGENT_TASK 2>/dev/null; then
-      [[ "$AGENT_TASK" == "exit" || "$AGENT_TASK" == "quit" ]] && return 1
-      [[ -z "$AGENT_TASK" ]] && { echo -ne "\r\033[2K"; continue; }
-      AGENT_TASK_SOURCE="user"
-      return 0
-    else
-      # Timeout — erase prompt, loop back to check inbox
-      echo -ne "\r\033[2K"
+    IFS= read -r AGENT_TASK 2>/dev/null
+    local _read_status=$?
+
+    # ── Cleanup ──────────────────────────────────────────
+    kill "$_watcher_pid" 2>/dev/null
+    wait "$_watcher_pid" 2>/dev/null
+    trap - USR1
+
+    # ── Handle result ────────────────────────────────────
+    if [[ $_read_status -ne 0 ]]; then
+      if [[ $_inbox_arrived -eq 1 ]]; then
+        echo ""   # newline after any partial input on screen
+        continue  # loop back → check inbox → handle task
+      fi
+      return 1    # EOF / Ctrl+D → agent exits
     fi
+
+    [[ "$AGENT_TASK" == "exit" || "$AGENT_TASK" == "quit" ]] && return 1
+    [[ -z "$AGENT_TASK" ]] && continue   # empty Enter → re-prompt
+
+    AGENT_TASK_SOURCE="user"
+    return 0
   done
 }
