@@ -1,5 +1,16 @@
 [
   {
+    "id": 1773083347416,
+    "role": "dev",
+    "task": "fix bug from qa review",
+    "sender": "Dashboard",
+    "targets": [
+      "dev"
+    ],
+    "status": "queued",
+    "createdAt": "2026-03-09T19:09:07.418Z"
+  },
+  {
     "id": 1772741513692,
     "role": "dev",
     "task": "ออกแบบหน้า landing page สำหรับการขายบ้าน มีหลายโครงการให้เลือก",

@@ -358,7 +358,14 @@
               <section class="panel panel--compact" id="panel-review">
                 <div class="panel-header">
                   <h2>PENDING REVIEW</h2>
-                  <div class="panel-tag">Approve & handoff</div>
+                  <button id="auto-approve-toggle" class="auto-approve-toggle">⚡ Auto-Approve OFF</button>
+                </div>
+                <div id="auto-approve-stages" class="auto-approve-stages" style="display:none">
+                  <label><input type="checkbox" data-stage="po" checked> PO</label>
+                  <label><input type="checkbox" data-stage="tech" checked> Tech</label>
+                  <label><input type="checkbox" data-stage="dev" checked> Dev</label>
+                  <label><input type="checkbox" data-stage="qa"> QA</label>
+                  <span class="auto-approve-hint">QA unchecked = always needs review</span>
                 </div>
                 <div id="review-feedback" class="feedback"></div>
                 <div id="review-queue" class="review-queue"></div>
@@ -462,33 +469,34 @@
       <div id="skills-api-unavailable" class="skills-api-unavailable hidden">
         Skills API ไม่พร้อม (404) — กรุณา <strong>restart dashboard server</strong>: <code>cd web && node server.js</code>
       </div>
-      <div class="skills-sub-tabs" id="skills-sub-tabs">
-        <button type="button" class="skills-sub-tab skills-sub-tab--active" data-skill-panel="map" id="skills-sub-tab-map">Skill Map</button>
-        <button type="button" class="skills-sub-tab" data-skill-panel="list" id="skills-sub-tab-list">Assign Skills</button>
-      </div>
-      <div class="skills-sub-panels">
-        <div class="skills-sub-panel skills-sub-panel--active" id="skills-panel-map">
-          <div id="skills-graph-container" class="skills-graph-container">
-            <div class="graph-placeholder">
-              <span class="graph-placeholder-icon">⬡</span>
-              <span>Click SKILLS tab to load 3D graph</span>
-            </div>
-          </div>
+
+      <!-- 3D Graph — fills all available space -->
+      <div id="skills-graph-container" class="skills-graph-container">
+        <div class="graph-placeholder">
+          <span class="graph-placeholder-icon">⬡</span>
+          <span>Loading 3D skill graph…</span>
         </div>
-        <div class="skills-sub-panel" id="skills-panel-list">
-          <div class="skills-assignment">
-            <div class="skills-agent-tabs" id="skills-agent-tabs">
-              <button class="skills-agent-tab skills-agent-tab--active" data-agent="po">🧑‍💼 PO<span class="agent-skill-count hidden" id="count-po">0</span></button>
-              <button class="skills-agent-tab" data-agent="tech">🏗️ Tech<span class="agent-skill-count hidden" id="count-tech">0</span></button>
-              <button class="skills-agent-tab" data-agent="dev">💻 Dev<span class="agent-skill-count hidden" id="count-dev">0</span></button>
-              <button class="skills-agent-tab" data-agent="qa">🧪 QA<span class="agent-skill-count hidden" id="count-qa">0</span></button>
-              <button class="skills-agent-tab" data-agent="devops">🚀 DevOps<span class="agent-skill-count hidden" id="count-devops">0</span></button>
-              <input type="search" id="skills-search" class="skills-search" placeholder="Search skills…" autocomplete="off">
-              <span class="skills-save-hint" id="skills-save-hint"></span>
-            </div>
-            <div id="skills-content" class="skills-content">
-              <div class="skills-loading">Loading skills…</div>
-            </div>
+      </div>
+
+      <!-- Collapsible assignment drawer at bottom -->
+      <div class="skills-drawer" id="skills-drawer">
+        <button type="button" class="skills-drawer-toggle" id="skills-drawer-toggle">
+          <span class="drawer-label">CONFIGURE SKILLS</span>
+          <span class="drawer-meta" id="drawer-meta"></span>
+          <span class="drawer-chevron" id="drawer-chevron">▲</span>
+        </button>
+        <div class="skills-drawer-body" id="skills-drawer-body">
+          <div class="skills-agent-tabs" id="skills-agent-tabs">
+            <button class="skills-agent-tab skills-agent-tab--active" data-agent="po">🧑‍💼 PO<span class="agent-skill-count hidden" id="count-po">0</span></button>
+            <button class="skills-agent-tab" data-agent="tech">🏗️ Tech<span class="agent-skill-count hidden" id="count-tech">0</span></button>
+            <button class="skills-agent-tab" data-agent="dev">💻 Dev<span class="agent-skill-count hidden" id="count-dev">0</span></button>
+            <button class="skills-agent-tab" data-agent="qa">🧪 QA<span class="agent-skill-count hidden" id="count-qa">0</span></button>
+            <button class="skills-agent-tab" data-agent="devops">🚀 DevOps<span class="agent-skill-count hidden" id="count-devops">0</span></button>
+            <input type="search" id="skills-search" class="skills-search" placeholder="Search skills…" autocomplete="off">
+            <span class="skills-save-hint" id="skills-save-hint"></span>
+          </div>
+          <div id="skills-content" class="skills-content">
+            <div class="skills-loading">Loading skills…</div>
           </div>
         </div>
       </div>

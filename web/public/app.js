@@ -274,6 +274,56 @@ function renderWorkflow() {
   } else {
     currentEl.style.display = 'none';
   }
+
+  // Sync auto-approve toggle
+  renderAutoApprove(w.autoApprove);
+}
+
+function renderAutoApprove(cfg) {
+  const toggle = document.getElementById('auto-approve-toggle');
+  const stages = document.getElementById('auto-approve-stages');
+  if (!toggle) return;
+  const enabled = cfg?.enabled || false;
+  toggle.classList.toggle('auto-approve-toggle--on', enabled);
+  toggle.textContent = enabled ? '⚡ Auto-Approve ON' : '⚡ Auto-Approve OFF';
+  if (stages) stages.style.display = enabled ? 'flex' : 'none';
+  // Sync stage checkboxes
+  if (stages && cfg?.stages) {
+    stages.querySelectorAll('input[type=checkbox]').forEach(cb => {
+      cb.checked = cfg.stages.includes(cb.dataset.stage);
+    });
+  }
+}
+
+async function toggleAutoApprove() {
+  const toggle = document.getElementById('auto-approve-toggle');
+  const stages = document.getElementById('auto-approve-stages');
+  const currentlyOn = toggle?.classList.contains('auto-approve-toggle--on');
+  const selectedStages = stages
+    ? [...stages.querySelectorAll('input[type=checkbox]:checked')].map(cb => cb.dataset.stage)
+    : ['po', 'tech', 'dev', 'qa'];
+  try {
+    await fetch('/api/workflow/auto-approve', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ enabled: !currentlyOn, stages: selectedStages }),
+    });
+    loadWorkflow();
+  } catch (e) { console.warn(e); }
+}
+
+async function updateAutoApproveStages() {
+  const toggle = document.getElementById('auto-approve-toggle');
+  const stages = document.getElementById('auto-approve-stages');
+  if (!toggle?.classList.contains('auto-approve-toggle--on')) return;
+  const selectedStages = [...stages.querySelectorAll('input[type=checkbox]:checked')].map(cb => cb.dataset.stage);
+  try {
+    await fetch('/api/workflow/auto-approve', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ enabled: true, stages: selectedStages }),
+    });
+  } catch (e) { console.warn(e); }
 }
 
 let _lastReviewQueueKey = '';
@@ -303,13 +353,20 @@ function renderReviewQueue() {
   container.innerHTML = queue.map(item => {
     const roleLabels = { po: 'Product Owner', tech: 'Tech Lead', dev: 'Developer', qa: 'QA Tester' };
     const fromLabel  = roleLabels[item.fromRole] || item.fromRole;
-    const isComplete = item.fromRole === 'qa' || !item.handoffTo;
+    const isQA      = item.fromRole === 'qa';
+    const isComplete = isQA || !item.handoffTo;
     const toLabel    = isComplete ? '✅ Pipeline Complete' : (ROLE_LABELS[item.handoffTo] || item.handoffTo);
     const taskShort  = (item.task || '').slice(0, 80) + ((item.task || '').length > 80 ? '…' : '');
-    const actions = isComplete
-      ? `<button class="btn btn--secondary btn-reject" data-action="reject">Dismiss</button>`
-      : `<button class="btn-tiny btn-reject" data-action="reject">Reject</button>
-         <button class="btn btn--primary btn-approve" data-action="approve">Approve & Send</button>`;
+    const actions = isQA
+      ? `<textarea class="qa-bug-notes" placeholder="Bug notes (optional — leave blank if no bugs found)…" rows="3"></textarea>
+         <div class="qa-actions">
+           <button class="btn btn--danger btn-reject" data-action="reject">🐛 Bugs Found → Send Back to Dev</button>
+           <button class="btn btn--primary btn-approve" data-action="approve">✅ Passed → Complete</button>
+         </div>`
+      : isComplete
+        ? `<button class="btn btn--secondary btn-reject" data-action="reject">Dismiss</button>`
+        : `<button class="btn-tiny btn-reject" data-action="reject">Reject</button>
+           <button class="btn btn--primary btn-approve" data-action="approve">Approve & Send</button>`;
     return `
       <div class="review-item" data-id="${item.id}" data-from="${item.fromRole}">
         <div class="review-item-header">
@@ -374,13 +431,31 @@ async function approveReview(item) {
 }
 
 async function rejectReview(item) {
+  const fb = document.getElementById('review-feedback');
   try {
-    await fetch('/api/workflow/reject', {
+    // If QA rejects, grab bug notes from textarea
+    const reviewEl = document.querySelector(`.review-item[data-id="${item.id}"]`);
+    const bugNotes = reviewEl?.querySelector('.qa-bug-notes')?.value?.trim() || '';
+    const isQA = item.fromRole === 'qa';
+
+    const r = await fetch('/api/workflow/reject', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ reviewId: item.id, fromRole: item.fromRole }),
+      body: JSON.stringify({
+        reviewId: item.id,
+        fromRole: item.fromRole,
+        ...(isQA && { bugReport: bugNotes, sendBackTo: 'dev' }),
+      }),
     });
-    loadWorkflow();
+    const data = await r.json();
+    if (data.success) {
+      if (isQA) {
+        showFeedback(fb, '🐛 Bug report sent to Developer — pipeline moved back to Dev stage', 'ok');
+        loadWorkflow(); loadStatus();
+      } else {
+        loadWorkflow();
+      }
+    }
   } catch (e) { console.warn(e); }
 }
 
@@ -1169,6 +1244,7 @@ function updateAgentTabCounts() {
       badge.classList.toggle('hidden', count === 0);
     }
   });
+  updateDrawerMeta();
 }
 
 async function toggleSkill(agentId, skillId) {
@@ -1224,24 +1300,42 @@ async function toggleSkill(agentId, skillId) {
   }
 }
 
-function initSkillsSubTabs() {
-  const tabs = document.querySelectorAll('.skills-sub-tab[data-skill-panel]');
-  const panels = document.querySelectorAll('.skills-sub-panel');
+function initSkillsDrawer() {
+  const drawer  = document.getElementById('skills-drawer');
+  const toggle  = document.getElementById('skills-drawer-toggle');
+  if (!drawer || !toggle) return;
 
-  function switchSkillsPanel(panelId) {
-    tabs.forEach(t => t.classList.toggle('skills-sub-tab--active', t.dataset.skillPanel === panelId));
-    panels.forEach(p => p.classList.toggle('skills-sub-panel--active', p.id === `skills-panel-${panelId}`));
-    if (panelId === 'map') setTimeout(initSkillsGraph, 50);
-  }
-
-  tabs.forEach(t => {
-    t.addEventListener('click', () => switchSkillsPanel(t.dataset.skillPanel));
+  toggle.addEventListener('click', () => {
+    const open = drawer.classList.toggle('skills-drawer--open');
+    if (open) renderSkillsContent();
   });
+}
+
+function openSkillsDrawer() {
+  const drawer = document.getElementById('skills-drawer');
+  if (drawer && !drawer.classList.contains('skills-drawer--open')) {
+    drawer.classList.add('skills-drawer--open');
+    renderSkillsContent();
+  }
+}
+
+function updateDrawerMeta() {
+  const meta = document.getElementById('drawer-meta');
+  if (!meta) return;
+  const total = Object.values(state.agentSkills)
+    .reduce((sum, arr) => sum + (Array.isArray(arr) ? arr.length : 0), 0);
+  meta.textContent = total > 0 ? `${total} assigned` : '';
 }
 
 function onSkillsTabActivated() {
   if (!state.skillsCatalog.length) {
-    loadSkills().then(() => setTimeout(initSkillsGraph, 150));
+    loadSkills().then(() => {
+      setTimeout(initSkillsGraph, 150);
+      // Auto-open drawer if any agent has skills assigned
+      const hasSkills = Object.values(state.agentSkills)
+        .some(arr => Array.isArray(arr) && arr.length > 0);
+      if (hasSkills) openSkillsDrawer();
+    });
   } else {
     setTimeout(initSkillsGraph, 150);
   }
@@ -1364,10 +1458,16 @@ function init() {
   // Apply / save
   document.getElementById('btn-save-paths').addEventListener('click', savePaths);
 
+  // Auto-approve toggle
+  document.getElementById('auto-approve-toggle')?.addEventListener('click', toggleAutoApprove);
+  document.getElementById('auto-approve-stages')?.querySelectorAll('input[type=checkbox]').forEach(cb => {
+    cb.addEventListener('change', updateAutoApproveStages);
+  });
+
   // Live view tabs
   initLiveTabs();
   initMainNav();
-  initSkillsSubTabs();
+  initSkillsDrawer();
   initLogFilter();
 
   // Clear log

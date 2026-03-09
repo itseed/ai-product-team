@@ -1,6 +1,12 @@
 {
   "pipelines": [
     {
+      "id": "1773078148933",
+      "task": "create landing page for SaaS Omni-chat platform",
+      "stage": "po",
+      "createdAt": "2026-03-09T17:42:28.933Z"
+    },
+    {
       "id": "1772792605782",
       "task": "ออกแบบหน้า landing page",
       "stage": "po",
@@ -86,9 +92,18 @@
     }
   ],
   "current": {
-    "id": "1772792605782",
-    "task": "ออกแบบหน้า landing page",
-    "stage": "po",
-    "createdAt": "2026-03-06T10:23:25.782Z"
+    "id": "1773078148933",
+    "task": "create landing page for SaaS Omni-chat platform",
+    "stage": "qa",
+    "createdAt": "2026-03-09T17:42:28.933Z"
+  },
+  "autoApprove": {
+    "enabled": true,
+    "stages": [
+      "po",
+      "tech",
+      "dev",
+      "qa"
+    ]
   }
 }

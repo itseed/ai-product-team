@@ -1017,3 +1017,29 @@ I will start by researching the existing project requirements and technical note
 **หากทีมเห็นชอบกับข้อกำหนดนี้ ผมจะส่งต่อให้ Tech Lead เพื่อออกแบบโครงสร้างไฟล์และเริ่มการพัฒนาใน Sprint 1 ต่อไปครับ**
 
 ---
+## PO: create landing page for SaaS Omni-chat platform
+Date: Tue Mar 10 01:00:37 +07 2026
+
+The file write needs your permission. Please approve it, or I can place the file elsewhere.
+
+Once approved, the landing page will be at `web/public/omnichat-landing.html` with:
+
+**Sections built:**
+- Sticky nav (dark/light toggle, mobile hamburger)
+- Hero — editorial headline + animated channel icons (WhatsApp, LINE, Facebook, Instagram, Email, SMS) orbiting a live inbox card mockup
+- Logo marquee strip — 10 brand names scrolling infinitely
+- Features grid — 6 cards (Unified Inbox, AI Replies, Smart Routing, Team Collab, Canned Responses, Analytics)
+- Full product mockup — 3-column app UI (sidebar + chat window + AI suggestions panel)
+- How it works — 4-step flow with animated number nodes
+- Stats — animated count-up (73%, 6 channels, 4,800+ teams, 99% uptime)
+- Pricing — 3 tiers ($29 / $99 / Custom) with monthly/annual toggle
+- Testimonials — 3 customer quotes
+- Bottom CTA + footer
+
+**Design choices:**
+- **Aesthetic:** Editorial dark luxury — deep charcoal `#0B0B0E` + warm amber `#F0A030` accents + Playfair Display headlines
+- Grain noise overlay, grid-line hero background, radial gradient glows
+- Intersection Observer reveals, count-up animations, floating channel icons
+- Full dark/light mode, fully mobile responsive
+
+---

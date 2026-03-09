@@ -37,16 +37,49 @@ CLAUDE_CMD="claude"
 GEMINI_CMD="gemini"
 
 # Role → AI model assignments
-AI_PO="gemini"          # Product Owner    → Claude
-AI_TECH="cursor"        # Tech Lead        → Claude
+AI_PO="claude"          # Product Owner    → Claude
+AI_TECH="claude"        # Tech Lead        → Claude
 AI_DEV="cursor"         # Developer        → Cursor Agent (writes files!)
-AI_QA="gemini"          # QA Tester        → Gemini
+AI_QA="claude"          # QA Tester        → Gemini
 AI_DEVOPS="claude"      # DevOps           → Claude
 
 # ── tmux Session ─────────────────────────────────────────────
 SESSION="ai_team"
 TERM_WIDTH=220
 TERM_HEIGHT=55
+
+# ── Helper: append skills to system prompt ───────────────────
+# Usage: append_skills "system_prompt" "role"
+# Reads shared/skills.json and appends assigned skill names to the prompt
+append_skills() {
+  local system="$1"
+  local role="$2"
+  local skills_file="$SHARED_DIR/skills.json"
+
+  [[ ! -f "$skills_file" ]] && { echo "$system"; return; }
+
+  local skill_names
+  skill_names=$(python3 -c "
+import json
+try:
+    data = json.load(open('$skills_file'))
+    ids = data.get('$role', [])
+    if ids:
+        print('\n'.join('- ' + s.replace('-', ' ').title() for s in ids))
+except: pass
+" 2>/dev/null)
+
+  if [[ -z "$skill_names" ]]; then
+    echo "$system"
+    return
+  fi
+
+  echo "$system
+
+## Active Skills
+You have been assigned these specialized capabilities. Apply them as relevant when handling the task:
+$skill_names"
+}
 
 # ── Helper: call AI ──────────────────────────────────────────
 # Usage: call_ai "ai_name" "system_prompt" "user_input"

@@ -1,11 +1,9 @@
 #!/bin/bash
 # ============================================================
 #  AI Product Team — Developer Agent
-#  AI: Cursor Agent | Role: Implementation, Code, Unit Tests
-#  cursor agent --print has FULL tool access:
-#    - Writes files directly to workspace
-#    - Runs bash commands
-#    - Reads/edits existing files
+#  AI: configured via config.sh (AI_DEV)
+#  Role: Implementation, Code, Bug Fixes, Unit Tests
+#  Supports: claude (--dangerously-skip-permissions) | cursor | gemini
 # ============================================================
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
@@ -21,28 +19,28 @@ COLOR=$COLOR_DEV
 AI=$AI_DEV
 INBOX_ROLE="dev"
 
-# Workspace where Cursor Agent will write code files
+# Workspace where the agent will write code files
 WORKSPACE_DIR="${WORKSPACE_DIR:-$PROJECT_DIR/code}"
 export WORKSPACE_DIR
 
 get_system_prompt() {
-  echo "You are a skilled Full-Stack Developer powered by Cursor Agent. You have FULL tool access — you can write files, run bash, and edit code directly.
+  echo "You are a Full-Stack Developer with FULL tool access — you can write files, run bash, and edit code directly.
 
-Your responsibilities:
-- Implement features based on user stories and technical specs
-- Write clean, maintainable, well-structured code INTO FILES (don't just print code)
-- Create unit tests alongside implementation files
-- Follow SOLID principles, DRY, and clean code practices
-- Optimize performance and ensure code security
-- Fix bugs by reading the actual file, finding the issue, and patching it
+Working directory: $WORKSPACE_DIR
 
-When given a task:
-1. Think about the file structure first
-2. WRITE the actual files using your file tools (not just print code blocks)
-3. Run a quick sanity check with bash if applicable
-4. Report what files were created/modified
+CRITICAL RULES:
+1. ALWAYS write actual files to disk using your Write/Edit tools — never just print code blocks
+2. If asked to build something, create the file immediately at the specified path
+3. Fix bugs by reading the file first, then patching the exact issue
+4. After writing files, confirm with: 'Created: <filename> (<size>)'
 
-Working directory: $WORKSPACE_DIR"
+Task types you handle:
+- Build new features / pages / components → write files
+- Fix bugs from QA → read file, patch, confirm fix
+- Refactor code → edit in-place
+- API integration → implement + test
+
+Keep responses concise — just do the work and report what was done."
 }
 
 # ── Banner (AI model from config.sh) ─────────────────────────
@@ -53,7 +51,6 @@ cat << EOF
  ║         💻  DEVELOPER  AGENT                     ║
  ║══════════════════════════════════════════════════║
  ║  AI Model  : ${AI_DEV}
- ║  Tools     : File Write · Bash · Read · Edit     ║
  ║  Focus     : Code · Implementation · Tests       ║
  ║  Inbox     : shared/inbox/dev/                   ║
  ╚══════════════════════════════════════════════════╝
@@ -64,6 +61,9 @@ echo -e "${GRAY}Coordinator can route tasks here with: @dev <task>${NC}"
 echo -e "${GRAY}Workspace: ${WORKSPACE_DIR}${NC}"
 if [[ "$AI_DEV" == "cursor" ]]; then
   echo -e "${GRAY}Tip: ถ้า Cursor ขึ้น error login → พิมพ์ exit แล้วรัน: cursor agent login${NC}"
+fi
+if [[ "$AI_DEV" == "claude" ]]; then
+  echo -e "${GRAY}Mode: claude --dangerously-skip-permissions (file write enabled)${NC}"
 fi
 echo ""
 
@@ -84,15 +84,30 @@ while true; do
   [[ "$task" == "workspace" ]] && { echo -e "${GRAY}$WORKSPACE_DIR${NC}"; ls "$WORKSPACE_DIR" 2>/dev/null; continue; }
 
   echo ""
-  echo -e "${COLOR}┌─ 💻 $ROLE (Cursor Agent) working... ─────────────┐${NC}"
+  echo -e "${COLOR}┌─ 💻 $ROLE working... ────────────────────────────┐${NC}"
   echo -e "${COLOR}│${NC}  ${GRAY}AI: $AI  ·  Workspace: $WORKSPACE_DIR${NC}"
   echo -e "${COLOR}│${NC}"
   log_event "$ROLE" "$task"
 
-  # Run cursor agent in the code workspace
-  # It will write files directly there
+  # Run agent in the code workspace with full file-write access
   cd "$WORKSPACE_DIR" 2>/dev/null
-  response=$(call_ai "$AI" "$(append_skills "$(get_system_prompt)" "$INBOX_ROLE")" "$task")
+  if [[ "$AI" == "claude" ]]; then
+    # --dangerously-skip-permissions lets claude use file tools without prompting
+    full_prompt="$(append_skills "$(get_system_prompt)" "$INBOX_ROLE")
+
+User request: $task"
+    echo -e "${COLOR}│${NC}  ${GRAY}Running with file-write access...${NC}"
+    response=$("$CLAUDE_CMD" --dangerously-skip-permissions -p "$full_prompt" 2>&1)
+    # Detect error and retry once
+    if echo "$response" | grep -q "^\[Error\]\|unavailable\|not found"; then
+      echo -e "${COLOR}│${NC}  ${GRAY}Retrying...${NC}"
+      sleep 2
+      response=$("$CLAUDE_CMD" --dangerously-skip-permissions -p "$full_prompt" 2>&1) \
+        || response="[Error] Claude CLI unavailable after retry"
+    fi
+  else
+    response=$(call_ai "$AI" "$(append_skills "$(get_system_prompt)" "$INBOX_ROLE")" "$task")
+  fi
   cd "$SCRIPT_DIR" 2>/dev/null
 
   echo "$response" | while IFS= read -r line; do
@@ -123,7 +138,7 @@ while true; do
 
   # Log
   {
-    echo "## Developer (Cursor): $task"
+    echo "## Developer ($AI): $task"
     echo "Date: $(date)"
     echo ""
     echo "$response"

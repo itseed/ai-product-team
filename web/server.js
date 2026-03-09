@@ -493,16 +493,20 @@ app.post('/api/workflow/start', (req, res) => {
 
 const HANDOFF_CHAIN = { po: 'tech', tech: 'dev', dev: 'qa' };
 
-app.post('/api/workflow/approve', (req, res) => {
-  const { reviewId, fromRole, handoffTo, output } = req.body;
-  if (!reviewId || !fromRole || !handoffTo) return res.status(400).json({ error: 'Missing fields' });
-
+// ── Shared approve logic (used by manual approve + auto-approve) ──────────
+function doApprove(reviewId, fromRole, handoffTo, output) {
   const nextHandoff = HANDOFF_CHAIN[handoffTo] || null;
   const fromLabels = { po: 'Product Owner requirements', tech: 'Tech Lead architecture', dev: 'Developer implementation', qa: 'QA test results' };
   const proceedLabels = { tech: 'technical design', dev: 'implementation', qa: 'quality assurance testing' };
-  const fromLabel   = fromLabels[fromRole]   || `${fromRole} output`;
+  const fromLabel    = fromLabels[fromRole]   || `${fromRole} output`;
   const proceedLabel = proceedLabels[handoffTo] || 'next phase';
-  const nextTask = `Based on ${fromLabel}:\n\n${output}\n\n---\n\nProceed with: ${proceedLabel}.`;
+
+  // Truncate large outputs so agent prompts stay manageable
+  const MAX = 3000;
+  const truncated = output && output.length > MAX
+    ? output.slice(0, MAX) + `\n\n...[truncated ${output.length - MAX} chars]...`
+    : (output || '');
+  const nextTask = `Based on ${fromLabel}:\n\n${truncated}\n\n---\n\nProceed with: ${proceedLabel}.`;
 
   sendTask(handoffTo, 'Dashboard', nextTask, {
     workflowId: reviewId,
@@ -515,7 +519,6 @@ app.post('/api/workflow/approve', (req, res) => {
     if (fs.existsSync(handoffPath)) fs.unlinkSync(handoffPath);
   } catch {}
 
-  // Update workflow state so pipeline shows next stage
   const wfState = loadWorkflowState();
   if (wfState.current && String(wfState.current.id) === String(reviewId)) {
     wfState.current.stage = handoffTo;
@@ -525,17 +528,73 @@ app.post('/api/workflow/approve', (req, res) => {
   const ts = new Date().toISOString().replace('T', ' ').slice(0, 19);
   try { fs.appendFileSync(path.join(LOGS_DIR, 'team.log'),
         `[${ts}] [Dashboard] Approved ${fromRole} → ${handoffTo}\n`); } catch {}
+}
 
+app.post('/api/workflow/approve', (req, res) => {
+  const { reviewId, fromRole, handoffTo, output } = req.body;
+  if (!reviewId || !fromRole || !handoffTo) return res.status(400).json({ error: 'Missing fields' });
+  doApprove(reviewId, fromRole, handoffTo, output);
   res.json({ success: true });
 });
 
+// ── Auto-approve toggle & poller ─────────────────────────────────────────
+app.post('/api/workflow/auto-approve', (req, res) => {
+  const { enabled, stages } = req.body;
+  const wfState = loadWorkflowState();
+  wfState.autoApprove = { enabled: !!enabled, stages: stages || ['po', 'tech', 'dev', 'qa'] };
+  saveWorkflowState(wfState);
+  res.json({ success: true, autoApprove: wfState.autoApprove });
+});
+
+// Poll every 8s — auto-approve items whose fromRole is in the enabled stages list
+setInterval(() => {
+  try {
+    const wfState = loadWorkflowState();
+    if (!wfState.autoApprove?.enabled) return;
+    const allowedStages = wfState.autoApprove.stages || ['po', 'tech', 'dev', 'qa'];
+    const queue = getReviewQueue();
+    for (const item of queue) {
+      if (allowedStages.includes(item.fromRole) && item.handoffTo) {
+        const ts = new Date().toISOString().replace('T', ' ').slice(0, 19);
+        try { fs.appendFileSync(path.join(LOGS_DIR, 'team.log'),
+              `[${ts}] [Auto-Approve] ${item.fromRole} → ${item.handoffTo}\n`); } catch {}
+        doApprove(item.id, item.fromRole, item.handoffTo, item.output);
+      }
+    }
+  } catch {}
+}, 8000);
+
 app.post('/api/workflow/reject', (req, res) => {
-  const { reviewId, fromRole } = req.body;
+  const { reviewId, fromRole, bugReport, sendBackTo } = req.body;
   if (!reviewId || !fromRole) return res.status(400).json({ error: 'Missing fields' });
+
+  // Delete the handoff file
   try {
     const handoffPath = path.join(WORKFLOW_DIR, `${reviewId}_${fromRole}.handoff`);
     if (fs.existsSync(handoffPath)) fs.unlinkSync(handoffPath);
   } catch {}
+
+  // If QA rejects, send bug report back to dev
+  if (fromRole === 'qa' && sendBackTo === 'dev') {
+    const bugTask = `QA found bugs that need to be fixed before release.\n\n**Bug Report from QA:**\n${bugReport || 'Issues found during QA testing — please review and fix.'}\n\n---\n\nPlease fix the bugs and update the implementation.`;
+    sendTask('dev', 'QA', bugTask, {
+      workflowId: reviewId,
+      handoffTo: 'qa',
+      taskId: reviewId,
+    });
+
+    // Update pipeline stage back to dev
+    const wfState = loadWorkflowState();
+    if (wfState.current && String(wfState.current.id) === String(reviewId)) {
+      wfState.current.stage = 'dev';
+      saveWorkflowState(wfState);
+    }
+
+    const ts = new Date().toISOString().replace('T', ' ').slice(0, 19);
+    try { fs.appendFileSync(path.join(LOGS_DIR, 'team.log'),
+          `[${ts}] [Dashboard] QA rejected → sent back to Dev for fixes\n`); } catch {}
+  }
+
   res.json({ success: true });
 });
 
