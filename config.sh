@@ -247,3 +247,158 @@ read_input() {
     return 0
   done
 }
+
+# ── Timeout-aware AI call ─────────────────────────────────────
+# Usage: call_ai_timeout "ai_name" "system_prompt" "input" [timeout_sec]
+# Returns: response text; exits with 1 on timeout/empty
+call_ai_timeout() {
+  local ai="$1" system="$2" input="$3" timeout_sec="${4:-120}"
+  local full_prompt="$system
+
+User request: $input"
+  local result exit_code
+
+  case "$ai" in
+    claude)
+      result=$(timeout "$timeout_sec" "$CLAUDE_CMD" -p "$full_prompt" 2>/dev/null)
+      exit_code=$?
+      ;;
+    gemini)
+      result=$(timeout "$timeout_sec" "$GEMINI_CMD" -p "$full_prompt" 2>/dev/null)
+      exit_code=$?
+      ;;
+    cursor)
+      cd "${WORKSPACE_DIR:-$PROJECT_DIR/code}" 2>/dev/null
+      result=$(echo "$full_prompt" | timeout "$timeout_sec" cursor agent --print 2>/dev/null)
+      exit_code=$?
+      ;;
+    *)
+      echo "[Error] Unknown AI: $ai"; return 1
+      ;;
+  esac
+
+  if [[ $exit_code -eq 124 ]]; then
+    echo "[Timeout] $ai did not respond within ${timeout_sec}s — task skipped"
+    return 1
+  fi
+  if [[ -z "$result" ]]; then
+    echo "[Error] $ai returned empty response"
+    return 1
+  fi
+  echo "$result"
+}
+
+# ── Shared agent banner ───────────────────────────────────────
+# Usage: show_agent_banner "EMOJI TITLE" "Focus line" "inbox/role/" "AI_VAR_NAME"
+show_agent_banner() {
+  local title="$1" focus="$2" inbox="$3" ai_var="$4"
+  local ai_val="${!ai_var}"
+  local color="$COLOR"
+  clear
+  echo -e "${color}"
+  printf ' ╔══════════════════════════════════════════════════╗\n'
+  printf " ║  %-47s║\n" "$title  AGENT"
+  printf ' ║══════════════════════════════════════════════════║\n'
+  printf " ║  AI Model  : %-35s║\n" "$ai_val"
+  printf " ║  Focus     : %-35s║\n" "$focus"
+  printf " ║  Inbox     : %-35s║\n" "$inbox"
+  printf ' ╚══════════════════════════════════════════════════╝\n'
+  echo -e "${NC}"
+}
+
+# ── Shared agent loop ─────────────────────────────────────────
+# Call from each agent after setting globals:
+#   ROLE, ROLE_SHORT, COLOR, INBOX_ROLE, ICON
+#   AGENT_AI_VAR   — name of config var, e.g. "AI_PO"
+#   AGENT_TIMEOUT  — seconds (default 120)
+#   AGENT_NOTES    — path to notes .md file
+#   AGENT_FINAL    — set to "1" if this is the last pipeline stage (QA)
+# Optional: define custom_ai_call() to override AI invocation (used by dev)
+run_agent() {
+  local script_dir="$1"
+  local ai_var="${AGENT_AI_VAR:-AI_PO}"
+  local timeout_sec="${AGENT_TIMEOUT:-120}"
+
+  while true; do
+    source "$script_dir/../config.sh"
+    [[ -f "$SHARED_DIR/paths.sh" ]] && source "$SHARED_DIR/paths.sh"
+    local ai="${!ai_var}"
+
+    read_input "$INBOX_ROLE" "$COLOR" "$ROLE_SHORT" || break
+    local task="$AGENT_TASK"
+
+    # Built-in utility commands
+    if [[ "$task" == "workspace" && -n "$WORKSPACE_DIR" ]]; then
+      echo -e "${GRAY}$WORKSPACE_DIR${NC}"; ls "$WORKSPACE_DIR" 2>/dev/null; continue
+    fi
+
+    echo ""
+    echo -e "${COLOR}┌─ ${ICON:-🤖} $ROLE processing... ──────────────────────┐${NC}"
+    echo -e "${COLOR}│${NC}  ${GRAY}AI: $ai${NC}"
+    log_event "$ROLE" "$task"
+
+    # Get system prompt
+    local system_prompt
+    if declare -f get_system_prompt > /dev/null 2>&1; then
+      system_prompt=$(get_system_prompt)
+    else
+      system_prompt="$SYSTEM_PROMPT"
+    fi
+    local full_system
+    full_system=$(append_skills "$system_prompt" "$INBOX_ROLE")
+
+    # Call AI — use custom_ai_call if defined, else call_ai_timeout
+    local response
+    if declare -f custom_ai_call > /dev/null 2>&1; then
+      response=$(custom_ai_call "$ai" "$full_system" "$task" "$timeout_sec")
+    else
+      response=$(call_ai_timeout "$ai" "$full_system" "$task" "$timeout_sec")
+    fi
+
+    # Retry once on failure
+    if [[ -z "$response" || "$response" == \[Error\]* || "$response" == \[Timeout\]* ]]; then
+      local err_msg="$response"
+      echo -e "${COLOR}│${NC}  ${YELLOW}⚠ ${err_msg:-Empty response}. Retrying in 3s...${NC}"
+      sleep 3
+      if declare -f custom_ai_call > /dev/null 2>&1; then
+        response=$(custom_ai_call "$ai" "$full_system" "$task" "$timeout_sec")
+      else
+        response=$(call_ai_timeout "$ai" "$full_system" "$task" "$timeout_sec")
+      fi
+      if [[ -z "$response" || "$response" == \[Error\]* || "$response" == \[Timeout\]* ]]; then
+        response="${response:-[Error] $ai did not respond. Check CLI or switch AI in config.}"
+      fi
+    fi
+
+    echo -e "${COLOR}│${NC}"
+    echo "$response" | while IFS= read -r line; do
+      echo -e "${COLOR}│${NC}  $line"
+    done
+    echo -e "${COLOR}│${NC}"
+    echo -e "${COLOR}└───────────────────────────────────────────────────┘${NC}"
+
+    # Save to notes
+    if [[ -n "$AGENT_NOTES" ]]; then
+      mkdir -p "$(dirname "$AGENT_NOTES")" 2>/dev/null
+      { echo "## $ROLE ($ai): $task"; echo "Date: $(date)"; echo ""; echo "$response"; echo ""; echo "---"; } \
+        >> "$AGENT_NOTES" 2>/dev/null
+    fi
+
+    # Workflow handoff
+    if [[ -n "$WORKFLOW_ID" ]]; then
+      mkdir -p "$SHARED_DIR/workflow"
+      local hfile="$SHARED_DIR/workflow/${WORKFLOW_ID}_${INBOX_ROLE}.handoff"
+      { echo "HANDOFF_TO=${HANDOFF_TO:-}"; echo "---TASK---"; echo "$task"; echo "---OUTPUT---"; echo "$response"; } \
+        > "$hfile"
+      if [[ -n "$HANDOFF_TO" ]]; then
+        log_event "$ROLE" "Workflow $WORKFLOW_ID → handoff to $HANDOFF_TO"
+      else
+        log_event "$ROLE" "Workflow $WORKFLOW_ID complete"
+      fi
+    fi
+
+    echo ""
+  done
+
+  echo -e "${COLOR}[$ROLE] Session ended.${NC}"
+}
